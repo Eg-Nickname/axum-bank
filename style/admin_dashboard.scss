@@ -1,0 +1,232 @@
+body{
+    background-color: var(--neutral-100);
+    overflow-x: hidden;
+    font-size: 16px;
+    color: var(--neutral-600);
+    overflow-wrap: break-word !important;
+}
+.content{
+    margin: 0px;
+    display: grid;
+    grid-template-columns: minmax(0, min-content) 1fr;
+    row-gap: 24px;
+    column-gap: 24px;
+}
+
+.link-container{
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 1;
+    margin-left: 24px;
+    display: flex;
+    align-items: center;
+}
+
+
+
+/* Info */
+.info-container{
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row-start: 1;
+    grid-row-end: 3;
+}
+
+/* Forms */
+.addmoney-container{
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 2;
+    margin-left: 24px;
+}
+
+h1{
+    font-size: 28px;
+    color: var(--neutral-800);
+    font-weight: 600px;
+}
+
+
+/* Tabela */
+.withdraws-container{
+    grid-column-start: 1;
+    grid-column-end: end;
+    grid-row-start: 3;
+    margin: 0 24px;
+    max-width: 96vw;
+}
+.withdraws-wrapper{
+    display: grid;
+    grid-template-columns: minmax(0, min-content) 120px minmax(0, 1fr) minmax(0, min-content) minmax(0, min-content) minmax(0, 3fr) minmax(0, min-content);
+    grid-auto-rows: minmax(50px auto);
+    row-gap: 16px;
+    column-gap: 8px;
+}
+
+.withdraws-wrapper .collumn-name{
+    font-size: 18px;
+    color: var(--neutral-700);
+    font-weight: 600;
+}
+
+.withdraws-wrapper div{
+    padding: 6px;
+}
+
+div.title{
+    overflow-wrap: break-word;
+}
+
+/* Status wypłaty */
+.status-success{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px;
+    width: 100px;
+    height: 16px;
+    border-radius: 32px;
+    color: var(--success-main) !important;
+    border: 2px solid var(--success-main) !important;
+    background-color: var(--success-bg);
+    font-weight: 600;
+}
+.status-success:hover{
+    color: var(--success-border) !important;
+    border: 2px solid var(--success-border) !important;
+    transition: all 0.2s;
+}
+
+.status-warning{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px;
+    width: 90px;
+    height: 16px;
+    border-radius: 32px;
+    color: var(--warning-main) !important;
+    border: 2px solid var(--warning-main) !important;
+    background-color: var(--warning-bg);
+    font-weight: 600;
+}
+.status-warning:hover{
+    color: var(--warning-border) !important;
+    border: 2px solid var(--warning-border) !important;
+    transition: all 0.2s;
+}
+
+.status-success i, .status-warning i{
+    margin-top: 0px;
+    margin-right: 5px;
+}
+
+.withdraws-wrapper .status-success p::before{
+    content: "Wypłacone";
+}
+
+.withdraws-wrapper .status-warning p::before{
+    content: "Oczekuje";
+}
+
+.more-info, #info{
+    display: none;
+}
+
+@media (max-width: 1050px){
+    .withdraws-wrapper{
+        grid-template-columns: minmax(0, min-content) 120px minmax(0, 1fr) minmax(0, min-content) minmax(0, min-content) minmax(0, 3fr);
+    }
+
+    .date, #date{
+        display: none;
+    }
+}
+
+@media (max-width: 920px){
+    .withdraws-wrapper{
+        grid-template-columns: minmax(0, min-content) 120px minmax(0, 1fr) minmax(0, min-content) minmax(0, min-content);
+    }
+
+    .reciver, #reciver{
+        display: none;
+    }
+}
+
+@media (max-width: 580px){
+    .currency, #currency, .ammount, #ammount, .sender, #sender{
+        display: none;
+    }
+    .withdraws-wrapper{
+        grid-template-columns: minmax(0, min-content) 80px  minmax(0, min-content);
+    }
+    .more-info, #info{
+        display: flex;
+    }
+
+    .withdraws-wrapper .status-success p::before, .withdraws-wrapper .status-warning p::before{
+        content: "";
+    }
+
+    .withdraws-wrapper .status-success, .withdraws-wrapper .status-warning{
+        display: flex;
+        width: 16px;
+        justify-content: center;
+        align-items: center;
+    }
+    .withdraws-wrapper .status-success i, .withdraws-wrapper .status-warning i{
+        margin: 0;
+    }
+}
+
+.selected-transaction-container{
+    display: none;
+}
+
+@media (max-width: 920px){
+    .content{
+        margin: 0px;
+        display: grid;
+        grid-template-columns: 1fr;
+        row-gap: 24px;
+        column-gap: 24px;
+    }
+    
+    .link-container{
+        grid-row: auto;
+        margin: 0 16px;
+    }
+    .addmoney-container{
+        grid-row: auto;
+        margin: 0 16px;
+    }
+    .info-container{
+        grid-row: auto / span 1;
+        grid-column-start: 1;
+        grid-column-end: 1;
+        margin: 0 16px;
+    }
+    .selected-transaction-container{
+        grid-row: auto;
+        display: grid;
+        grid-column-start: 1;
+        grid-column-end: 1;
+        margin: 0 16px;
+
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .selected-transaction-container div{
+        padding-top: 10px;
+        overflow-wrap: break-word !important;
+    }
+    .selected-transaction-container #sel-trans-title{
+        max-width: 80vw;
+    }
+
+    .withdraws-container{
+        grid-row: auto;
+        grid-column-start: 1;
+        grid-column-end: 1;
+        margin: 0 16px;
+    }
+}

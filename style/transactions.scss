@@ -1,0 +1,311 @@
+body{
+    overflow-x: hidden;
+}
+
+/* Okno przelewu */
+.popup .overlay{
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.7);
+    z-index: 10;
+    display: none;
+}
+
+.popup .content-popup{
+    position: fixed;
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%, -50%) scale(0);
+    background: #fff;
+    width: auto;
+    max-width: 96vw;
+    height: auto;
+    z-index: 15;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+}
+
+.popup .close-bnt{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: 30px;
+    height: 30px;
+    background: #222;
+    color: #fff;
+    font-size: 25px;
+    font-weight: 600;
+    line-height: 30px;
+    text-align: center;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.popup.actice .overlay {
+    display: block;
+}
+
+.popup.active .overlay {
+    display: block;
+}
+.popup.active .content-popup {
+    transition: all 300ms ease-out;
+    transform: translate(-50%, -50%) scale(1);
+    border-radius: 10px;
+}
+
+/* Formularz Przelewu */
+.input-box{
+    margin: 20px;
+}
+.input-box i{
+    font-size: 16px;
+    font-weight: 600;
+}
+#id_reciver_id, #id_sender_id{
+    width: 300px;
+}
+
+#id_title{
+    width: 300px;
+}
+#id_kwota,  #id_title{
+    padding: 0 20px;
+    width: 256px;
+    color: #444;
+    line-height: 28px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+}
+#id_waluta, #id_waluta2, #id_daterange{
+    width: 300px;
+}
+
+#NewTransaction_reciver_id{
+    width: 300px;
+}
+
+#NewTransaction_title{
+    width: 300px;
+}
+#NewTransaction_kwota,  #NewTransaction_title{
+    padding: 0 20px;
+    width: 256px;
+    color: #444;
+    line-height: 28px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+}
+#NewTransaction_waluta, #NewTransaction_waluta2{
+    width: 300px;
+}
+
+.help-text{
+    max-width: 300px;
+    margin-top: 10px;
+    font-weight: 500;
+}
+.dodaj-srodki{
+    margin-left: 12px;
+}
+
+.content{
+    display: grid;
+    grid-template-columns: minmax(0, 512px) minmax(0, 1fr);
+    grid-template-rows: min-content;
+    row-gap: 24px;
+    column-gap: 24px;
+}
+
+
+/* Informacje */
+.info-container{
+    margin-left: 32px;
+    grid-column-start: 1;
+    grid-column-end: end;
+    grid-row-start: 1;
+}
+.info-inner-container{
+    display: flex;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    padding: 20px;
+}
+.currency-ammount{
+    width: auto;
+    line-height: 40px;
+    overflow-wrap: normal;
+}
+.currency-flag{
+    width: 60px !important;
+    margin-right: 10px;
+}
+
+.country-flag{
+    height: 40px;
+    max-width: 60px;
+    width: auto;
+}
+
+/* Filter */
+.transactions h3{
+    color: #444;
+}
+.filter-box{
+    max-width: 430px;
+    margin: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+.filter-box i{
+    margin-right: 10px;
+}
+.filter-options{
+    margin-bottom: 15px;
+    padding: 15px;
+    display: none;
+}
+.filter-active{
+    display: block !important;
+}
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+    margin-bottom: 15px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--neutral-200);
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: var(--neutral-000);
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: var(--primary-main);
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px var(--primary-hover);
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(20px);
+    -ms-transform: translateX(20px);
+    transform: translateX(20px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+
+/* Transactions */
+.transactions-container{
+    grid-row-start: 3;
+    grid-row-end: end;
+    grid-column-start: 1;
+    grid-column-end: end;
+    margin: 0 32px;
+}
+.transactions-wrapper{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 60px minmax(0, 2fr) minmax(0, 1fr);
+    grid-auto-rows: minmax(50px auto);
+    row-gap: 16px;
+    column-gap: 16px;
+}
+
+.transactions-wrapper .collumn-name{
+    font-size: 18px;
+    color: var(--neutral-700);
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+}
+
+.transactions-wrapper div{
+    overflow-wrap: break-word;
+}
+
+.transactions-wrapper .more-info, .transactions-wrapper #more-info{
+    display: none;
+}
+.transactions-wrapper .currency{
+    display: flex;
+    justify-content: center;
+}
+
+@media (max-width: 1100px){
+    .transactions-container{
+        margin: 0 16px;
+    }
+}
+
+@media (max-width: 950px){
+    .transactions-wrapper{
+        grid-template-columns: 100px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 60px minmax(0, 1fr);
+    }
+
+    .transactions-wrapper .title, .transactions-wrapper #title{
+        display: none;
+    }
+    .transactions-wrapper .more-info, .transactions-wrapper #more-info{
+        display: flex;
+    }
+}
+
+@media (max-width: 800px){
+    .transactions-wrapper{
+        grid-template-columns: 100px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 60px;
+    }
+
+    .transactions-wrapper .date, .transactions-wrapper #date{
+        display: none;
+    }
+}
+
+@media (max-width: 680px){
+    .transactions-wrapper{
+        grid-template-columns: 100px minmax(0, 1fr) 60px;
+    }
+
+    .transactions-wrapper .sender, .transactions-wrapper #sender, .transactions-wrapper .reciver, .transactions-wrapper #reciver{
+        display: none;
+    }
+}

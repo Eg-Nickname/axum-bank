@@ -1,0 +1,51 @@
+
+#id_amount_owned, #id_amount_wanted, #id_amount_recived, #id_amount_exchanged{
+    padding: 0 20px;
+    width: 256px;
+    color: #444;
+    line-height: 28px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+}
+
+.button-oferawymiany{
+    width: auto;
+}
+
+#id_exchange_from,  #id_exchange_to{
+    width: 300px;
+}
+.content{
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 0;
+}
+
+.exchange-info-container{
+    grid-column-start: 1;
+    grid-column-end: end;
+    margin: 0 24px;
+}
+
+/*Exchange listings */
+.exchange-listing-container{
+    margin-left: 24px;
+}
+
+#NewExchaneListing_exchange_from, #NewExchaneListing_exchange_to{
+    width: 280px;
+}
+
+#NewExchaneListing_amount_owned,  #NewExchaneListing_amount_wanted{
+    padding: 0 20px;
+    width: 241px;
+    color: #444;
+    line-height: 28px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+}
+
+@media (max-width: 700px){
+    .content{
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
