@@ -1,8 +1,8 @@
 body{
-    background-color: var(--neutral-100);
+    background-color: $neutral-100;
     overflow-x: hidden;
     font-size: 16px;
-    color: var(--neutral-600);
+    color: $neutral-600;
     overflow-wrap: break-word !important;
 }
 .content{
@@ -42,7 +42,7 @@ body{
 
 h1{
     font-size: 28px;
-    color: var(--neutral-800);
+    color: $neutral-800;
     font-weight: 600px;
 }
 
@@ -65,7 +65,7 @@ h1{
 
 .withdraws-wrapper .collumn-name{
     font-size: 18px;
-    color: var(--neutral-700);
+    color: $neutral-700;
     font-weight: 600;
 }
 
@@ -86,14 +86,14 @@ div.title{
     width: 100px;
     height: 16px;
     border-radius: 32px;
-    color: var(--success-main) !important;
-    border: 2px solid var(--success-main) !important;
-    background-color: var(--success-bg);
+    color: $success-main !important;
+    border: 2px solid $success-main !important;
+    background-color: $success-bg;
     font-weight: 600;
 }
 .status-success:hover{
-    color: var(--success-border) !important;
-    border: 2px solid var(--success-border) !important;
+    color: $success-border !important;
+    border: 2px solid $success-border !important;
     transition: all 0.2s;
 }
 
@@ -105,14 +105,14 @@ div.title{
     width: 90px;
     height: 16px;
     border-radius: 32px;
-    color: var(--warning-main) !important;
-    border: 2px solid var(--warning-main) !important;
-    background-color: var(--warning-bg);
+    color: $warning-main !important;
+    border: 2px solid $warning-main !important;
+    background-color: $warning-bg;
     font-weight: 600;
 }
 .status-warning:hover{
-    color: var(--warning-border) !important;
-    border: 2px solid var(--warning-border) !important;
+    color: $warning-border !important;
+    border: 2px solid $warning-border !important;
     transition: all 0.2s;
 }
 

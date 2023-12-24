@@ -45,6 +45,12 @@ body{
     border-radius: 50%;
     cursor: pointer;
 }
+.popup .close-bnt i{
+    position: relative;
+    width: 16px !important;
+    height: 16px !important;
+    top: 2px;
+}
 
 .popup.actice .overlay {
     display: block;
@@ -195,7 +201,7 @@ body{
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: var(--neutral-200);
+    background-color: $neutral-200;
     -webkit-transition: .4s;
     transition: .4s;
 }
@@ -207,17 +213,17 @@ body{
     width: 18px;
     left: 4px;
     bottom: 4px;
-    background-color: var(--neutral-000);
+    background-color: $neutral-000;
     -webkit-transition: .4s;
     transition: .4s;
 }
 
 input:checked + .slider {
-    background-color: var(--primary-main);
+    background-color: $primary-main;
 }
 
 input:focus + .slider {
-    box-shadow: 0 0 1px var(--primary-hover);
+    box-shadow: 0 0 1px $primary-hover;
 }
 
 input:checked + .slider:before {
@@ -253,7 +259,7 @@ input:checked + .slider:before {
 
 .transactions-wrapper .collumn-name{
     font-size: 18px;
-    color: var(--neutral-700);
+    color: $neutral-700;
     font-weight: 600;
     display: flex;
     justify-content: center;
