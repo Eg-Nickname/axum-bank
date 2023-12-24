@@ -1,138 +1,122 @@
 use leptos::*;
+use leptos_router::*;
 
 // use leptos_router::*;
 #[component]
-fn NewTransactionPopUp(state: bool, change_state: WriteSignal<bool>) -> impl IntoView{
-    if state{
-        view! {
-            <div class="popup active" id="popup-1">
-            <div class="overlay" on:click=move |_| {change_state(false);}></div>
-            
-            <div class="content-popup">
-                // <form method="post">
-                // <h1>"Nowy Przelew"</h1>
-                // // TODO add new transaction form
-                // // {% for field in transaction_form %} 
-                // //     <div class="input-box">
-                // //         <i>{{field.label}}:</i>
-                // //         <br>
-                // //         <br>
-                // //         {{field}}
-                // //     </div>
-    
-                // //     {% for error in transaction_form.field.errors %}
-                // //         <p class="login-error">{{error}}</p>
-                // //     {% endfor %}
-                // // {% endfor %}
-    
-    
-                // //     {% if transaction_form.non_field_errors %}
-                // //         <div class="">
-                // //             <a>{{transaction_form.non_field_errors}}</a>
-                // //         </div>
-                // //     {% endif %}
-                // <input type="submit" class="buton-przelew" value="Wyslij przelew" name="transaction" />
-                // </form>
-
-                // <ActionForm action=action>
-                // <h1>"Nowy Przelew"</h1>
-                // // TYTUŁ PRZELEWU
-                // // NAZWA ODBIORCY
-                // // KWOTA
-                // // WALUTA
-                // <div class="input-box">
-                //     <i>{{field.label}}:</i>
-                //     <br/>
-                //     <br/>
-                //     {{field}}
-                // </div>
-    
-
-                //     <input type="submit" class="buton-przelew" value="Wyslij przelew" name="transaction" />
-                // </ActionForm>
-    
-                <div class="close-bnt" on:click=move |_| {change_state(false);}><i class="fa-solid fa-xmark"></i></div>
-            </div>
-        </div>
-        }
-    }else{
-        view!{<div></div>}
-    }
-} 
-
-#[component]
-fn WithrawOrderPopUp(state: bool, change_state: WriteSignal<bool>) -> impl IntoView{
-    if state{
-        view! {
-            <div class="popup active" id="popup-2">
-                <div class="overlay" on:click=move |_| {change_state(false);}></div>
-                <div class="content-popup">
-
-                <form method="post">
-                <h1>Wypłać Pieniądze</h1>
-            //     <!-- Form -->
-            //     {% for field in withdraw_form %}
-                        
+pub fn NewTransactionPopUp() -> impl IntoView{
+    view! {
+        <div class="popup active" id="popup-1">
+        <A href="/transactions"><div class="overlay"></div></A>
+        
+        <div class="content-popup">
+            <form method="post">
+            <h1>"Nowy Przelew"</h1>
+            // TODO add new transaction form
+            // {% for field in transaction_form %} 
             //     <div class="input-box">
             //         <i>{{field.label}}:</i>
             //         <br>
             //         <br>
             //         {{field}}
-            //         {% if field.help_text %}
-            //             <div class="help-text">{{field.help_text}}</div>
-            //         {% endif %}
             //     </div>
 
-            //     {% for error in withdraw_form.field.errors %}
+            //     {% for error in transaction_form.field.errors %}
             //         <p class="login-error">{{error}}</p>
             //     {% endfor %}
             // {% endfor %}
 
 
-            //     {% if withdraw_form.non_field_errors %}
+            //     {% if transaction_form.non_field_errors %}
             //         <div class="">
-            //             <a>{{withdraw_form.non_field_errors}}</a>
+            //             <a>{{transaction_form.non_field_errors}}</a>
             //         </div>
             //     {% endif %}
+            <input type="submit" class="buton-przelew" value="Wyslij przelew" name="transaction" />
+            </form>
 
-                <input type="submit" class="buton-przelew" value="Wyplac pieniądze" name="withdraw" />
-                </form>
+            // <ActionForm action=action>
+            // <h1>"Nowy Przelew"</h1>
+            // // TYTUŁ PRZELEWU
+            // // NAZWA ODBIORCY
+            // // KWOTA
+            // // WALUTA
+            // <div class="input-box">
+            //     <i>{{field.label}}:</i>
+            //     <br/>
+            //     <br/>
+            //     {{field}}
+            // </div>
 
-                <div class="close-bnt" on:click=move |_| {change_state(false);}><i class="fa-solid fa-xmark"></i></div>
-                </div>
+
+            //     <input type="submit" class="buton-przelew" value="Wyslij przelew" name="transaction" />
+            // </ActionForm>
+
+            <A href="/transactions"><div class="close-bnt"><i class="fa-solid fa-xmark"></i></div></A>
+        </div>
+    </div>
+    }
+} 
+
+#[component]
+pub fn WithrawOrderPopUp() -> impl IntoView{
+    view! {
+        <div class="popup active" id="popup-2">
+            <A href="/transactions"><div class="overlay"></div></A>
+            <div class="content-popup">
+
+            <form method="post">
+            <h1>Wypłać Pieniądze</h1>
+        //     <!-- Form -->
+        //     {% for field in withdraw_form %}
+                    
+        //     <div class="input-box">
+        //         <i>{{field.label}}:</i>
+        //         <br>
+        //         <br>
+        //         {{field}}
+        //         {% if field.help_text %}
+        //             <div class="help-text">{{field.help_text}}</div>
+        //         {% endif %}
+        //     </div>
+
+        //     {% for error in withdraw_form.field.errors %}
+        //         <p class="login-error">{{error}}</p>
+        //     {% endfor %}
+        // {% endfor %}
+
+
+        //     {% if withdraw_form.non_field_errors %}
+        //         <div class="">
+        //             <a>{{withdraw_form.non_field_errors}}</a>
+        //         </div>
+        //     {% endif %}
+
+            <input type="submit" class="buton-przelew" value="Wyplac pieniądze" name="withdraw" />
+            </form>
+
+            <A href="/transactions"><div class="close-bnt"><i class="fa-solid fa-xmark"></i></div></A>
             </div>
-        }
-    }else{
-        view!{<div></div>}
+        </div>
     }
 }
 
 #[component]
 fn AccountBalance() -> impl IntoView{
-    let (new_transaction_popup_state, set_new_transaction_popup_state) = create_signal(false);
-    let (new_withdraw_popup_state, set_new_withdraw_popup_state) = create_signal(false);
     let balances = create_resource(|| (), move |_| {
         use crate::server::transactions::get_user_balances;
         get_user_balances()
     });
 
     view! {
-        {move || view!{
-            <NewTransactionPopUp state=new_transaction_popup_state() change_state=set_new_transaction_popup_state /> 
-        }}
-
-        {move || view!{
-            <WithrawOrderPopUp state=new_withdraw_popup_state() change_state=set_new_withdraw_popup_state /> 
-        }}
-
         <div class="info-container">
             <div class="informacje">
                 <h2>"Stan konta"</h2> 
-                <div>
-                    <button on:click=move |_| {set_new_transaction_popup_state(!new_transaction_popup_state());}><i class="fas fa-plus"></i>"Nowy Przelew"</button>
+                <div class="flexBlock">
+                    <A class="link-button action-button" href="new_transaction"><i class="fas fa-plus"></i>"Nowy Przelew"</A>
+                    // <button><i class="fas fa-plus"></i>"Nowy Przelew"</button>
                 </div>
                 <div class="flexBlock buttongroup">
-                <button on:click=move |_| {set_new_withdraw_popup_state(!new_withdraw_popup_state());}><i class="fas fa-money-bill-wave"></i>"Wypłata z konta"</button>
+                    <A class="link-button action-button" href="withdraw"><i class="fas fa-money-bill-wave"></i>"Wypłata z konta"</A>
                 </div>
                 <div class="currency-wrapper">
                 <Transition fallback=move || view! {<p>"Loading..."</p> }>

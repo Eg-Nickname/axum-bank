@@ -10,6 +10,8 @@ use crate::pages::signup_page::SignupPage;
 use crate::pages::fallback_page::FallbackPage;
 use crate::pages::transactions::TransactionsPage;
 
+use crate::pages::transactions::{NewTransactionPopUp, WithrawOrderPopUp};
+
 #[component]
 pub fn App() -> impl IntoView {
     let login = create_server_action::<Login>();
@@ -46,10 +48,16 @@ pub fn App() -> impl IntoView {
                 <Routes>
                     <Route path="" view=|| view! {<HomePage/> }/>
 
-                    <Route path="/transactions" view=|| view! { <RequireLoginWithRedirect><Outlet /></RequireLoginWithRedirect> }>
-                        <Route path="/" view=|| view! {<TransactionsPage/>} />
-                        <Route path="new_transaction/" view=|| view! {"nowa tranzakcyja" <TransactionsPage/> } />
-                        <Route path="withdraw/" view=|| view! {"wyplacamy kasiure" <TransactionsPage/> } />
+                    <Route path="/transactions" view=|| view! { 
+                        <RequireLoginWithRedirect>
+                            <Outlet />
+                            <TransactionsPage/>
+                        </RequireLoginWithRedirect> 
+                    
+                    }>
+                        <Route path="/" view=|| view! {} />
+                        <Route path="new_transaction/" view=|| view! { <NewTransactionPopUp /> } />
+                        <Route path="withdraw/" view=|| view! { <WithrawOrderPopUp /> } />
                     </Route>
 
                     <Route path="signup" view=move || view! {
