@@ -1,4 +1,3 @@
--- Add migration script here
 -- Trigger creating new currency balance for new user
 CREATE OR REPLACE FUNCTION create_balance_for_new_account()
     RETURNS TRIGGER 
