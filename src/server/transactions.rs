@@ -1,138 +1,148 @@
 use cfg_if::cfg_if;
-use leptos::*;
+use leptos::{*};
 use serde::{Deserialize, Serialize};
+use crate::auth::get_user;
 
+#[derive(sqlx::Type)]
+#[repr(i32)]
+pub enum TransactionType{
+    Other = 0,
+    Transfer = 1,
+    Withdraw = 2,
+    Payment = 3,
+    CurrencyExchange = 4
+}
 
-// #[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
-// pub struct ItemsQueryData{
-//     pub page: u32,
-//     pub item_name: String,
-//     pub language: String,
-//     pub sort_by: String,
-//     pub sort_order: String,
-//     pub color_search: bool,
-//     pub color: String,
-//     pub color_distance: String,
-// }
+#[derive(sqlx::Type)]
+#[repr(i32)]
+pub enum TransactionStatus{
+    Other = 0,
+    Pending = 1,
+    Sent = 2
+}
 
 cfg_if! {
-if #[cfg(feature = "ssr")] {
-    use crate::utils::pool;
-    
-//     #[allow(dead_code)]
-//     struct ValidatedItemsQueryData {
-//         page: u32,
-//         item_name: String,
-//         language: String,
-//         sort_by: String,
-//         sort_order: String,
-//         color_search: bool,
-//         color: (f64, f64, f64),
-//         color_distance: u32,
-//     }
+    if #[cfg(feature = "ssr")] {
+        use crate::utils::pool;
+        use crate::auth::User;
+        use sqlx::query;
 
-//     impl ItemsQueryData{
-//         fn validate(self) -> ValidatedItemsQueryData {
-//             let valid_page = self.page;
-//             // TODO: Validate item name if needed for db qyerry
-//             let valid_item_name = "%".to_string() + self.item_name.to_lowercase().as_str() + "%";
+    struct CurrencyId{
+        id: i64,
+    }
 
-//             let valid_language = match self.language.as_str() {
-//                 "pl" => "pl".to_string(),
-//                 "eng" | _ => "eng".to_string(),
-//             };
+    struct UserCurrencyBalance{
+        #[allow(dead_code)]
+        user_id: i64,
+        #[allow(dead_code)]
 
-//             let valid_sort_by = match self.sort_by.as_str(){
-//                 "eng-name" => "items.display_name_eng".to_string(),
-//                 "pl-name" => "items.display_name_pl".to_string(),
-//                 "mc-id" => "items.minecraft_item_id".to_string(),
-//                 // TODO: Dodać wyświetlanie tej opcji przy filtrowaniu kolorami
-//                 // "color-distance" => "color-distance".to_string(),
-//                 "default" | _ => "items.id".to_string(),
-//             }; 
+        currency_id: i64,
+        balance: i64,
+    }
 
-//             let valid_sort_order = match self.sort_order.as_str() {
-//                 "A-Z" => "ASC".to_string(),
-//                 "Z-A" | _ => "DESC".to_string()
-//             }; 
-//             let valid_color_search = self.color_search;
+    // TODO properly log error on server side
+    async fn get_balance(db_transcation: &mut sqlx::Transaction<'_, sqlx::Postgres>, user_id: i64, currency_id: i64) -> Result<UserCurrencyBalance, ServerFnError>{
+        match sqlx::query_as!(UserCurrencyBalance, "SELECT * FROM account_balance WHERE user_id=$1 AND currency_id=$2", user_id, currency_id).fetch_one(&mut **db_transcation).await{
+            Err(_) => return Err(ServerFnError::ServerError("Can't get currency balance of sender: {sender_username}".to_string())),
+            Ok(balance) => {
+                return Ok(balance);
+            }
+        }
+    }
 
-//             use colors_transform::{Rgb, Color};
-//             let parsed_color = Rgb::from_hex_str(self.color.as_str()).unwrap_or(Rgb::from(0.0, 0.0, 0.0));
-//             let valid_color = (parsed_color.get_red() as f64, parsed_color.get_green() as f64, parsed_color.get_blue() as f64);
-//             let valid_color_distance = self.color_distance.parse::<u32>().unwrap_or_default(); 
-
-//             ValidatedItemsQueryData { 
-//                 page: valid_page, 
-//                 item_name: valid_item_name, 
-//                 language: valid_language, 
-//                 sort_by: valid_sort_by, 
-//                 sort_order: valid_sort_order,
-//                 color_search: valid_color_search,
-//                 color: valid_color, 
-//                 color_distance: valid_color_distance 
-//             }
-//         }
-//     }
-// // SELECT items.id, items.display_name_eng, SUM(colors.color_index) 
-// // FROM items INNER JOIN colors ON items.id = colors.item_id 
-// // GROUP BY items.id
-// // ORDER BY items.id
-// // LIMIT 100
-//     impl ValidatedItemsQueryData{
-//         async fn query(self, pool: PgPool) -> Result<Vec<Item>, ServerFnError> {
-//             // let mut query: QueryBuilder<Postgres> = QueryBuilder::new("SELECT * FROM items WHERE ");
-//             let mut query: QueryBuilder<Postgres> = QueryBuilder::new("");
-
-//             query.push("SELECT items.id, items.item_name, items.display_name_eng, items.display_name_pl, items.item_meta, items.minecraft_item_id, items.has_nbt, items.filename, COALESCE(SUM(colors.color_index),0) AS color_similiarity ");
-//             query.push("FROM items INNER JOIN colors ON items.id = colors.item_id WHERE ");
-
-
-//             query.push(" (LOWER(items.display_name_eng) LIKE ");
-//             query.push_bind(self.item_name.clone());
-
-//             query.push(" OR LOWER(items.display_name_pl) LIKE ");
-//             query.push_bind(self.item_name);
-//             query.push(" ) ");
-
-//             if self.color_search {
-//                 query.push(" AND colors.color <-> cube(array[");
-//                 query.push_bind(self.color.0);
-//                 query.push(",");
-//                 query.push_bind(self.color.1);
-//                 query.push(",");
-//                 query.push_bind(self.color.2);
-//                 query.push("]) < ");
-//                 query.push_bind(self.color_distance as f64);
-//             }
-
-//             query.push(" GROUP BY items.id ");
-
-//             query.push(" ORDER BY ");
-//             query.push(self.sort_by.clone());
-            
-//             if self.sort_by == "items.minecraft_item_id"{
-//                 query.push("::INT ");
-//             }
-
-//             query.push(" ");
-//             query.push(self.sort_order);
-            
-//             query.push(" LIMIT 100 OFFSET ");
-//             query.push_bind((self.page*100) as i64);
-
-//             let mut items = Vec::with_capacity(100);
-//             let mut rows = query.build_query_as::<Item>().fetch(&pool);
-
-//             use futures::TryStreamExt;
-//             while let Some(row) = rows.try_next().await? {
-//                 items.push(row);
-//             }
+    // TODO properly log all possible errors on server side
+    async fn create_new_transaction(sender_username: String, reciver_username: String, currency_code: String, amount: i64, title: String, transcation_type: TransactionType, transaction_status: TransactionStatus) -> Result<(), ServerFnError>{
+        let pool = pool()?;
         
-//             Ok(items)
-//         }   
-//     }
+        // Validates if fuction input is correct
+        // Check if user with sender_username exists
+        let sender = match User::get_from_username(sender_username, &pool).await{
+            None => { return Err(ServerFnError::ServerError("Sender: {sender_username} does not exist.".to_string())); },
+            Some(sender) => sender
+        };
+        // Check if user with reciver_username exists
+        let reciver = match User::get_from_username(reciver_username, &pool).await{
+            None => { return Err(ServerFnError::ServerError("Reciver: {reciver_username} does not exist.".to_string())); },
+            Some(reciver) => reciver
+        };
+        // Check if currency with currency_code exists
+        let currency_id = match sqlx::query_as!(CurrencyId, "SELECT id FROM currencies WHERE code= $1", currency_code).fetch_one(&pool).await {
+            Err(_) => { return Err(ServerFnError::ServerError("Currency: {currency_code} does not exist.".to_string())) },
+            Ok(currency) => currency.id 
+        };
 
+        
+        // Begin db transaction to ensure that user balances won't change during transaction creation
+        let mut db_transaction = match pool.begin().await{
+            Err(_) => {
+                return Err(ServerFnError::ServerError("Cannot begin transaction".to_string()));
+            },
+            Ok(transaction) => transaction
+        };
+        
+        // Get sender balances
+        let sender_balance = get_balance(&mut db_transaction, sender.id, currency_id).await?;
+
+        // Check if sender has enough balance to make transaction
+        if sender_balance.balance - amount < 0{
+            return Err(ServerFnError::ServerError("Not enough balance to create transaction.".to_string()));
+        }
+        // TODO Add transaction to db and update sender & reciver balance
+        // Update sender balance
+        match query!(
+            "UPDATE account_balance SET balance = balance - $1 WHERE user_id = $2 AND currency_id = $3;",
+            amount,
+            sender.id,
+            currency_id
+        ).execute(&mut *db_transaction)
+        .await{
+            Err(_) =>{
+                return Err(ServerFnError::ServerError("Internal error during creating transaction".to_string()));
+            },
+            Ok(_) => (),
+        }
+
+        // Update reciver balance
+        match query!(
+            "UPDATE account_balance SET balance = balance + $1 WHERE user_id = $2 AND currency_id = $3;",
+            amount,
+            reciver.id,
+            currency_id
+        ).execute(&mut *db_transaction)
+        .await{
+            Err(_) =>{
+                return Err(ServerFnError::ServerError("Internal error during creating transaction".to_string()));
+            },
+            Ok(_) => (),
+        }
+
+        // Create transaction record
+        match query!(
+            "INSERT INTO transactions(sender_id, reciver_id, currency_id, ammount, status, type, title) VALUES ($1, $2, $3, $4, $5, $6, $7);",
+            sender.id,
+            reciver.id,
+            currency_id,
+            amount,
+            transaction_status as TransactionStatus,
+            transcation_type as TransactionType,
+            title
+        ).execute(&mut *db_transaction)
+        .await{
+            Err(_) =>{
+                return Err(ServerFnError::ServerError("Internal error during creating transaction".to_string()));
+            },
+            Ok(_) => (),
+        }
+
+        // Commit db transaction
+        match db_transaction.commit().await{
+            Err(_) =>{
+                return Err(ServerFnError::ServerError("Internal error during creating transaction".to_string()));
+            },
+            Ok(_) => (),
+        }
+        Ok(())
+    }
 }}
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -143,10 +153,9 @@ pub struct Balance {
     pub balance: i64,
 }
 
-#[server(GetUserBalance, "/api")]
+#[server(GetUserBalances, "/api")]
 pub async fn get_user_balances() -> Result<Vec<Balance>, ServerFnError> {
     let pool = pool()?;
-    use crate::auth::get_user;
     let maby_user = get_user().await;
 
     match maby_user {
@@ -166,6 +175,16 @@ pub async fn get_user_balances() -> Result<Vec<Balance>, ServerFnError> {
         },
         _ => {
             Err(ServerFnError::ServerError("User not logged in.".to_string()))
+        },
+    }
+}
+
+#[server(NewUserTransaction, "/api")]
+pub async fn new_user_transaction(reciver_username: String, currency_code: String, amount: i64, title: String) -> Result<(), ServerFnError>{
+    match get_user().await {
+        Ok(Some(user)) => { create_new_transaction(user.username, reciver_username, currency_code, amount, title, TransactionType::Transfer, TransactionStatus::Sent).await },
+        _ => {
+            Err(ServerFnError::ServerError("Can't get user to create transaction".to_string()))
         },
     }
 }
