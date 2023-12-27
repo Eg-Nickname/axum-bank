@@ -26,9 +26,6 @@ if #[cfg(feature = "ssr")] {
 
     async fn server_fn_handler(State(app_state): State<AppState>, auth_session: AuthSession<User, i64, SessionPgPool, PgPool>, path: Path<String>, headers: HeaderMap, raw_query: RawQuery,
     request: Request<AxumBody>) -> impl IntoResponse {
-
-        // log!("{:?}", path);
-
         handle_server_fns_with_context(path, headers, raw_query, move || {
             provide_context(auth_session.clone());
             provide_context(app_state.pool.clone());

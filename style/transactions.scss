@@ -66,50 +66,56 @@ body{
 }
 
 /* Formularz Przelewu */
-.input-box{
+.new-transaction-form .transacition-input-box{
     margin: 20px;
 }
-.input-box i{
+.new-transaction-form .transacition-input-box i{
     font-size: 16px;
     font-weight: 600;
 }
-#id_reciver_id, #id_sender_id{
-    width: 300px;
-}
 
-#id_title{
+.new-transaction-form .transaction-input{
     width: 300px;
-}
-#id_kwota,  #id_title{
     padding: 0 20px;
     width: 256px;
     color: #444;
     line-height: 28px;
     border: 1px solid #aaa;
     border-radius: 4px;
-}
-#id_waluta, #id_waluta2, #id_daterange{
-    width: 300px;
+    transition: 300ms all;
 }
 
-#NewTransaction_reciver_id{
-    width: 300px;
+.new-transaction-form .transaction-input:focus {
+    border: 2px solid $primary-hover !important;
 }
 
-#NewTransaction_title{
-    width: 300px;
+
+.new-transaction-form .transaction-input:hover {
+    border: 2px solid $primary-border;
 }
-#NewTransaction_kwota,  #NewTransaction_title{
-    padding: 0 20px;
-    width: 256px;
-    color: #444;
-    line-height: 28px;
-    border: 1px solid #aaa;
-    border-radius: 4px;
-}
-#NewTransaction_waluta, #NewTransaction_waluta2{
-    width: 300px;
-}
+
+// #id_waluta, #id_waluta2, #id_daterange{
+//     width: 300px;
+// }
+
+// #NewTransaction_reciver_id{
+//     width: 300px;
+// }
+
+// #NewTransaction_title{
+//     width: 300px;
+// }
+// #NewTransaction_kwota,  #NewTransaction_title{
+//     padding: 0 20px;
+//     width: 256px;
+//     color: #444;
+//     line-height: 28px;
+//     border: 1px solid #aaa;
+//     border-radius: 4px;
+// }
+// #NewTransaction_waluta, #NewTransaction_waluta2{
+//     width: 300px;
+// }
 
 .help-text{
     max-width: 300px;

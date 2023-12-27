@@ -1,56 +1,40 @@
 use leptos::*;
 use leptos_router::*;
 
-// use leptos_router::*;
+use crate::server::transactions::NewUserTransaction;
+
 #[component]
-pub fn NewTransactionPopUp() -> impl IntoView{
+pub fn NewTransactionPopUp(new_transaction_action: Action<NewUserTransaction, Result<(), ServerFnError>>) -> impl IntoView{
     view! {
         <div class="popup active" id="popup-1">
         <A href="/transactions"><div class="overlay"></div></A>
         
         <div class="content-popup">
-            <form method="post">
-            <h1>"Nowy Przelew"</h1>
-            // TODO add new transaction form
-            // {% for field in transaction_form %} 
-            //     <div class="input-box">
-            //         <i>{{field.label}}:</i>
-            //         <br>
-            //         <br>
-            //         {{field}}
-            //     </div>
+            <ActionForm action=new_transaction_action class="new-transaction-form">
+                <h1>"Nowy Przelew"</h1>
+                <div class="input-box1">
+                    <i>"Tytuł przelewu:"</i>
+                    <input type="text" placeholder="Tytuł" name="title" class="transaction-input" />
+                </div>
+                <div class="transacition-input-box">
+                    // TODO Add username suggestion while inputing
+                    <i>"Nazwa odbiorcy:"</i>
+                    <input type="text" placeholder="Reciver username" maxlength="32" name="reciver_username" class="transaction-input" />
+                </div>
+                <div class="transacition-input-box">
+                    // TODO change to custom select implementation
+                    <i>"Waluta"</i>
+                    <input type="text" placeholder="cny" maxlength="32" name="currency_code" class="transaction-input" />
+                </div>
+                <div class="transacition-input-box">
+                    <i>"Kwota"</i>
+                    <input type="number" placeholder="0" name="amount" class="transaction-input" />
+                </div>
+                <div class="transacition-input-box">
+                    <input type="submit" class="buton-przelew" value="Wyslij przelew" name="transaction" />
+                </div>
 
-            //     {% for error in transaction_form.field.errors %}
-            //         <p class="login-error">{{error}}</p>
-            //     {% endfor %}
-            // {% endfor %}
-
-
-            //     {% if transaction_form.non_field_errors %}
-            //         <div class="">
-            //             <a>{{transaction_form.non_field_errors}}</a>
-            //         </div>
-            //     {% endif %}
-            <input type="submit" class="buton-przelew" value="Wyslij przelew" name="transaction" />
-            </form>
-
-            // <ActionForm action=action>
-            // <h1>"Nowy Przelew"</h1>
-            // // TYTUŁ PRZELEWU
-            // // NAZWA ODBIORCY
-            // // KWOTA
-            // // WALUTA
-            // <div class="input-box">
-            //     <i>{{field.label}}:</i>
-            //     <br/>
-            //     <br/>
-            //     {{field}}
-            // </div>
-
-
-            //     <input type="submit" class="buton-przelew" value="Wyslij przelew" name="transaction" />
-            // </ActionForm>
-
+            </ActionForm>
             <A href="/transactions"><div class="close-bnt"><i class="fa-solid fa-xmark"></i></div></A>
         </div>
     </div>
@@ -102,6 +86,7 @@ pub fn WithrawOrderPopUp() -> impl IntoView{
 
 #[component]
 fn AccountBalance() -> impl IntoView{
+    // TODO UPDATE BALANCE AFTER CREATING NEW TRANSACTION
     let balances = create_resource(|| (), move |_| {
         use crate::server::transactions::get_user_balances;
         get_user_balances()
@@ -113,7 +98,6 @@ fn AccountBalance() -> impl IntoView{
                 <h2>"Stan konta"</h2> 
                 <div class="flexBlock">
                     <A class="link-button action-button" href="new_transaction"><i class="fas fa-plus"></i>"Nowy Przelew"</A>
-                    // <button><i class="fas fa-plus"></i>"Nowy Przelew"</button>
                 </div>
                 <div class="flexBlock buttongroup">
                     <A class="link-button action-button" href="withdraw"><i class="fas fa-money-bill-wave"></i>"Wypłata z konta"</A>

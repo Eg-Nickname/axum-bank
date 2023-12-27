@@ -1,31 +1,33 @@
 use cfg_if::cfg_if;
 use leptos::{*};
 use serde::{Deserialize, Serialize};
-use crate::auth::get_user;
 
-#[derive(sqlx::Type)]
-#[repr(i32)]
-pub enum TransactionType{
-    Other = 0,
-    Transfer = 1,
-    Withdraw = 2,
-    Payment = 3,
-    CurrencyExchange = 4
-}
-
-#[derive(sqlx::Type)]
-#[repr(i32)]
-pub enum TransactionStatus{
-    Other = 0,
-    Pending = 1,
-    Sent = 2
-}
 
 cfg_if! {
     if #[cfg(feature = "ssr")] {
         use crate::utils::pool;
+        use crate::auth::get_user;
         use crate::auth::User;
         use sqlx::query;
+
+        #[derive(sqlx::Type)]
+        #[repr(i32)]
+        pub enum TransactionType{
+            Other = 0,
+            Transfer = 1,
+            Withdraw = 2,
+            Payment = 3,
+            CurrencyExchange = 4
+        }
+        
+        #[derive(sqlx::Type)]
+        #[repr(i32)]
+        pub enum TransactionStatus{
+            Other = 0,
+            Pending = 1,
+            Sent = 2
+        }
+        
 
     struct CurrencyId{
         id: i64,
@@ -182,7 +184,9 @@ pub async fn get_user_balances() -> Result<Vec<Balance>, ServerFnError> {
 #[server(NewUserTransaction, "/api")]
 pub async fn new_user_transaction(reciver_username: String, currency_code: String, amount: i64, title: String) -> Result<(), ServerFnError>{
     match get_user().await {
-        Ok(Some(user)) => { create_new_transaction(user.username, reciver_username, currency_code, amount, title, TransactionType::Transfer, TransactionStatus::Sent).await },
+        Ok(Some(user)) => {
+            leptos_axum::redirect("/transactions");
+            create_new_transaction(user.username, reciver_username, currency_code, amount, title, TransactionType::Transfer, TransactionStatus::Sent).await },
         _ => {
             Err(ServerFnError::ServerError("Can't get user to create transaction".to_string()))
         },

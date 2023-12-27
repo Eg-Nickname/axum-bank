@@ -2,6 +2,7 @@ use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
 use crate::auth::*;
+use crate::server::transactions::NewUserTransaction;
 use crate::components::navbar::NavBar;
 use crate::components::require_login::RequireLoginWithRedirect;
 use crate::pages::homepage::HomePage;
@@ -14,10 +15,16 @@ use crate::pages::transactions::{NewTransactionPopUp, WithrawOrderPopUp};
 
 #[component]
 pub fn App() -> impl IntoView {
+    provide_meta_context();
+
+    // Actions
     let login = create_server_action::<Login>();
     let logout = create_server_action::<Logout>();
     let signup = create_server_action::<Signup>();
 
+    let new_transaction_action = create_server_action::<NewUserTransaction>();
+
+    // Resources
     let user: Resource<(usize, usize, usize), Result<Option<User>, ServerFnError>> = create_resource(
         move || {
             (
@@ -28,11 +35,7 @@ pub fn App() -> impl IntoView {
         },
         move |_| get_user(),
     );
-
-    // Provide user resource to components
     provide_context(user);
-
-    provide_meta_context();
 
     view! {
         <Stylesheet id="leptos" href="/pkg/axum-bank.css"/>
@@ -41,8 +44,6 @@ pub fn App() -> impl IntoView {
         <Router fallback=|| {
             view! {<FallbackPage />}.into_view()
         }>
-        
-        
             <NavBar />
             <div class="animation">
                 <Routes>
@@ -53,10 +54,9 @@ pub fn App() -> impl IntoView {
                             <Outlet />
                             <TransactionsPage/>
                         </RequireLoginWithRedirect> 
-                    
                     }>
                         <Route path="/" view=|| view! {} />
-                        <Route path="new_transaction/" view=|| view! { <NewTransactionPopUp /> } />
+                        <Route path="new_transaction/" view=move || view! { <NewTransactionPopUp new_transaction_action=new_transaction_action /> } />
                         <Route path="withdraw/" view=|| view! { <WithrawOrderPopUp /> } />
                     </Route>
 
