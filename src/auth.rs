@@ -65,7 +65,7 @@ if #[cfg(feature = "ssr")] {
         pub async fn get_from_username(name: String, pool: &PgPool) -> Option<Self> {
             let sqluser = sqlx::query_as!(
                 SqlUser,
-                r#"select id, username, password FROM users WHERE username = $1"#,
+                r#"select id, username, password FROM users WHERE username LIKE $1"#,
                 name
             )
             .fetch_one(pool)
