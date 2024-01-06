@@ -2,16 +2,19 @@ use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
 use crate::auth::*;
-use crate::server::transactions::NewUserTransaction;
+use crate::server::transactions::{NewUserTransaction, WithdrawOrder};
 use crate::components::navbar::NavBar;
 use crate::components::require_login::RequireLoginWithRedirect;
 use crate::pages::homepage::HomePage;
 use crate::pages::login_page::LoginPage;
 use crate::pages::signup_page::SignupPage;
 use crate::pages::fallback_page::FallbackPage;
-use crate::pages::transactions::TransactionsPage;
 
+use crate::pages::transactions::TransactionsPage;
 use crate::pages::transactions::{NewTransactionPopUp, WithrawOrderPopUp};
+
+use crate::pages::currency_exchange::CurrencyExchangePage;
+use crate::pages::currency_exchange::CreateExchangeListingPopUp;
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -23,6 +26,8 @@ pub fn App() -> impl IntoView {
     let signup = create_server_action::<Signup>();
 
     let new_transaction_action = create_server_action::<NewUserTransaction>();
+    let withdraw_order_action = create_server_action::<WithdrawOrder>();
+
 
     // Resources
     let user: Resource<(usize, usize, usize), Result<Option<User>, ServerFnError>> = create_resource(
@@ -57,8 +62,20 @@ pub fn App() -> impl IntoView {
                     }>
                         <Route path="/" view=|| view! {} />
                         <Route path="new_transaction/" view=move || view! { <NewTransactionPopUp new_transaction_action=new_transaction_action /> } />
-                        <Route path="withdraw/" view=|| view! { <WithrawOrderPopUp /> } />
+                        <Route path="withdraw/" view=move || view! { <WithrawOrderPopUp withdraw_order_action=withdraw_order_action /> } />
                     </Route>
+                    
+                    <Route path="/currency_exchange" view=|| view! { 
+                        <RequireLoginWithRedirect>
+                            <Outlet />
+                            <CurrencyExchangePage />
+                        </RequireLoginWithRedirect> 
+                    }>
+                        <Route path="/" view=|| view! {} />
+                        <Route path="new_exchange_order/" view=move || view! { <CreateExchangeListingPopUp /> } />
+                        // <Route path="exchange/" view=move || view! { <WithrawOrderPopUp withdraw_order_action=withdraw_order_action /> } />
+                    </Route>
+
 
                     <Route path="signup" view=move || view! {
                         <SignupPage action=signup/>

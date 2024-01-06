@@ -1,12 +1,11 @@
 use leptos::*;
 use leptos_router::*;
 
-use crate::server::transactions::NewUserTransaction;
-
+use crate::server::transactions::{NewUserTransaction, WithdrawOrder};
 #[component]
 pub fn NewTransactionPopUp(new_transaction_action: Action<NewUserTransaction, Result<(), ServerFnError>>) -> impl IntoView{
     view! {
-        <div class="popup active" id="popup-1">
+        <div class="popup active">
         <A href="/transactions"><div class="overlay"></div></A>
         
         <div class="content-popup">
@@ -42,43 +41,33 @@ pub fn NewTransactionPopUp(new_transaction_action: Action<NewUserTransaction, Re
 } 
 
 #[component]
-pub fn WithrawOrderPopUp() -> impl IntoView{
+pub fn WithrawOrderPopUp(withdraw_order_action: Action<WithdrawOrder, Result<(), ServerFnError>>) -> impl IntoView{
     view! {
-        <div class="popup active" id="popup-2">
+        <div class="popup active">
             <A href="/transactions"><div class="overlay"></div></A>
             <div class="content-popup">
 
-            <form method="post">
-            <h1>Wypłać Pieniądze</h1>
-        //     <!-- Form -->
-        //     {% for field in withdraw_form %}
-                    
-        //     <div class="input-box">
-        //         <i>{{field.label}}:</i>
-        //         <br>
-        //         <br>
-        //         {{field}}
-        //         {% if field.help_text %}
-        //             <div class="help-text">{{field.help_text}}</div>
-        //         {% endif %}
-        //     </div>
+                <ActionForm action=withdraw_order_action class="new-transaction-form">
+                    <h1>"Wypłać pieniądze"</h1>
+                    <div class="input-box1">
+                        <i>"Nick z serwera:"</i>
+                        <input type="text" placeholder="Nick z serwera" name="withdrawer_nick" class="transaction-input" />
+                    </div>
+                    <div class="transacition-input-box">
+                        // TODO change to custom select implementation
+                        <i>"Waluta"</i>
+                        <input type="text" placeholder="cny" maxlength="32" name="currency_code" class="transaction-input" />
+                    </div>
+                    <div class="transacition-input-box">
+                        <i>"Kwota"</i>
+                        <input type="number" placeholder="0" name="amount" class="transaction-input" />
+                    </div>
+                    <div class="transacition-input-box">
+                        <input type="submit" class="buton-przelew" value="Wypłać pieniądze" name="transaction" />
+                    </div>
 
-        //     {% for error in withdraw_form.field.errors %}
-        //         <p class="login-error">{{error}}</p>
-        //     {% endfor %}
-        // {% endfor %}
-
-
-        //     {% if withdraw_form.non_field_errors %}
-        //         <div class="">
-        //             <a>{{withdraw_form.non_field_errors}}</a>
-        //         </div>
-        //     {% endif %}
-
-            <input type="submit" class="buton-przelew" value="Wyplac pieniądze" name="withdraw" />
-            </form>
-
-            <A href="/transactions"><div class="close-bnt"><i class="fa-solid fa-xmark"></i></div></A>
+                </ActionForm>
+                <A href="/transactions"><div class="close-bnt"><i class="fa-solid fa-xmark"></i></div></A>
             </div>
         </div>
     }
@@ -136,7 +125,15 @@ fn AccountBalance() -> impl IntoView{
 
 #[component]
 fn Transactions() -> impl IntoView{
+    use crate::server::transactions::TransactionType;
+    // use crate::server::transactions::TransactionStatus;
+
     let (filter_status, set_filter_status) = create_signal(false);
+    let balances = create_resource(|| (), move |_| {
+        use crate::server::transactions::get_user_transactions;
+        get_user_transactions()
+    });
+
     view!{
         <div class="transactions-container">
         <h1>"Transakcje"</h1>
@@ -188,52 +185,59 @@ fn Transactions() -> impl IntoView{
     
             <div class="collumn-name" id="date">"Data"</div>
     
-            // TODO ADD querrying of transactions from db
-//                 {% for transaction in sent_transactions.qs %}
-                // TODO ADD LINK WITH MORE INFO
-                <div class="more-info"><a href="% transaction.transaction_id %">"Więcej Informacji"</a></div>
+            // TODO ADD LINK WITH MORE INFO
+            <div class="more-info"><a href="% transaction.transaction_id %">"Więcej Informacji"</a></div>
 
+            // TODO FIX TRANSACTION DISPLAY STYLE``
+            <Transition fallback=move || view! {<p>"Loading..."</p> }>
+            {move || {
+                let transactions_view = {move || {
+                    balances.get().map(move |res| match res {
+                        Ok(transactions_list) => {
+                            transactions_list.into_iter().map(move |transaction|{
+                                let trans_type = transaction.transaction_type.clone();
+                                view!{ 
+                                    // {transaction.id}
+                                    {move ||{
+                                        match transaction.transaction_type.clone(){
+                                            TransactionType::Transfer | TransactionType::CurrencyExchange => view! {
+                                                <div class="sender">{transaction.sender_username.clone().unwrap_or("Użytkownik usunięty".to_string())}</div>
+                                                <div class="reciver">{transaction.reciver_username.clone().unwrap_or("Użytkownik usunięty".to_string())}</div>
+                                            }.into_view(),
+                                            TransactionType::Withdraw | TransactionType::Payment | TransactionType::Other => view! {<div class="sender"></div><div class="reciver"></div>}.into_view(),
+                                        }
+                                    }}
 
-//                 {% if transaction.typ == 0 %}
-//                     {% if transaction.sender_id is not None %}
-//                         <div class="sender">{{transaction.sender_id}}</div>
-//                     {% else %}
-//                         <div class="sender">Użytkownik usunięty</div>
-//                     {% endif %}
-            
+                                    // TODO Check if user is sender or reciever of transaction
+                                    <div><a style="color: red;">"-"{transaction.amount}</a></div>
+                                    // <div><a style="color: rgb(0, 173, 0);">"+"{transaction.amount}</a></div>
+                                    
+                                    <div class="currency"><a>{transaction.currency_code}</a></div>
 
-//                     {% if transaction.reciver_id is not None %}
-//                         <div class="reciver">{{transaction.reciver_id}}</div>
-//                     {% else %}
-//                         <div class="reciver">Użytkownik usunięty</div>
-//                     {% endif %}
-//                 {% elif transaction.typ == 1 %}
-//                     <div class="sender">Wpłata na konto</div><div class="reciver"></div>
-//                 {% elif transaction.typ == 2 %}
-//                     <div class="sender">Wypłata z konta </bold></div><div class="reciver"></div>
-//                 {% elif transaction.typ == 3 %}
-//                     <div class="sender">Wymiana Walut</div><div class="reciver"></div>         
-//                 {% endif %}
-        
+                                    {move ||{
+                                        match trans_type{
+                                            TransactionType::Transfer | TransactionType::Other => view! { <div class="title"><a>{transaction.title.clone()}</a></div> }.into_view(),
+                                            TransactionType::CurrencyExchange => view! { <div class="title"><a>"Wymiana walut"</a></div>}.into_view(),
+                                            TransactionType::Withdraw => view! { <div class="title"><a>"Wypłata z konta"</a></div>}.into_view(),
+                                            TransactionType::Payment => view! { <div class="title"><a>"Wpłata na  konto"</a></div>}.into_view(),
+                                        }
+                                    }}
 
-//                 {% if transaction.sender_id == request.user %}
-//                     <div><a style="color: red;">-{{transaction.kwota}}</a></div>
-//                 {% else %}
-//                     <div><a style="color: rgb(0, 173, 0);">+{{transaction.kwota}}</a></div>
-//                 {% endif %}
-
-
-//                 <div class="currency"><a>{{transaction.waluta}}</a></div>
-    
-
-//                 {% if transaction.typ == 0 or 2 %}
-//                     <div class="title"><a>{{transaction.title}}</a></div>
-//                 {% else %}
-//                     <div></div>
-//                 {% endif %}
-//                     <div class="date"><a>{{transaction.data_transakcji}}</a></div>
-//                 {% endfor %}
-
+                                    <div class="date"><a>"19-10-2023 19:20:01"</a></div>
+                                }.into_view()
+                            }).collect_view()
+                        },
+                        Err(_) => view! { 
+                            <div></div> 
+                        }.into_view(),
+                    }).unwrap_or_default()
+                }};
+                view! {
+                    {transactions_view}
+                }
+                }
+            }
+            </Transition>
         </div>
     </div>
     }
