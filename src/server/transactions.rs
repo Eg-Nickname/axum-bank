@@ -246,9 +246,17 @@ pub async fn get_user_transactions() -> Result<Vec<Transaction>, ServerFnError> 
                 transactions.status as transaction_status,
                 transactions.type as transaction_type,
                 currencies.code as currency_code,
-                (SELECT username FROM users WHERE id=sender_id) as sender_username, 
-                (SELECT username FROM users WHERE id=reciver_id) as reciver_username 
-                FROM transactions JOIN currencies ON transactions.currency_id=currencies.id
+
+                sender.username as sender_username, 
+                reciver.username as reciver_username 
+
+                FROM transactions 
+                JOIN currencies ON transactions.currency_id=currencies.id
+
+                JOIN users as sender ON transactions.sender_id = sender.id
+                JOIN users as reciver ON transactions.reciver_id = reciver.id
+
+
                 WHERE transactions.sender_id= $1 OR transactions.reciver_id = $1
                 ORDER BY transactions.id DESC"#,
                 user.id
