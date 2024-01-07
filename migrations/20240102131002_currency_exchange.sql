@@ -1,15 +1,15 @@
 CREATE TABLE IF NOT EXISTS currency_exchange_listings (
     id bigserial PRIMARY KEY UNIQUE,
 
-    listing_creator BIGINT,
+    listing_creator BIGINT NOT NULL,
     FOREIGN KEY (listing_creator) REFERENCES users (id) ON DELETE CASCADE,
 
     currency_from_id BIGINT NOT NULL,
-    FOREIGN KEY (currency_from_id) REFERENCES currencies (id) ON DELETE NO ACTION,
+    FOREIGN KEY (currency_from_id) REFERENCES currencies (id) ON DELETE CASCADE,
     amount_to BIGINT NOT NULL DEFAULT 0,
     
     currency_to_id BIGINT NOT NULL,
-    FOREIGN KEY (currency_to_id) REFERENCES currencies (id) ON DELETE NO ACTION,
+    FOREIGN KEY (currency_to_id) REFERENCES currencies (id) ON DELETE CASCADE,
     amount_from BIGINT NOT NULL DEFAULT 0,
 
 

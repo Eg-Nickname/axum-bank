@@ -316,14 +316,14 @@ input[type=number]:focus{
 
 .button-del{
 	color: $neutral-000;
-	background-color: $danger-main;
+	background-color: $danger-main !important;
 	transition: all 0.4s ease-in;
 }
 
 .button-del:hover{
-	background-color: $danger-border;
-	border-color: $danger-bg;
-	color: $danger-pressed;
+	background-color: $danger-border !important;
+	border-color: $danger-bg !important;
+	color: $danger-pressed !important;
 	font-weight: 600;
 }
 

@@ -31,6 +31,17 @@
     margin-left: 24px;
 }
 
+.delete_exchange_listing_form{
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+
+.delete_exchange_listing_form input, .delete_exchange_listing_form a{
+    font-size: 16px;
+    width: 150px;
+}
+
 #NewExchaneListing_exchange_from, #NewExchaneListing_exchange_to{
     width: 280px;
 }

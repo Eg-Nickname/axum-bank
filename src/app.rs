@@ -3,6 +3,7 @@ use leptos_meta::*;
 use leptos_router::*;
 use crate::auth::*;
 use crate::server::transactions::{NewUserTransaction, WithdrawOrder};
+use crate::server::currency_exchange::CreateExchangeListing;
 use crate::components::navbar::NavBar;
 use crate::components::require_login::RequireLoginWithRedirect;
 use crate::pages::homepage::HomePage;
@@ -15,6 +16,8 @@ use crate::pages::transactions::{NewTransactionPopUp, WithrawOrderPopUp};
 
 use crate::pages::currency_exchange::CurrencyExchangePage;
 use crate::pages::currency_exchange::CreateExchangeListingPopUp;
+use crate::pages::currency_exchange::DeleteExchangeListingPopUp;
+
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -27,6 +30,8 @@ pub fn App() -> impl IntoView {
 
     let new_transaction_action = create_server_action::<NewUserTransaction>();
     let withdraw_order_action = create_server_action::<WithdrawOrder>();
+
+    let new_exchange_order_action = create_server_action::<CreateExchangeListing>();
 
 
     // Resources
@@ -47,17 +52,17 @@ pub fn App() -> impl IntoView {
         <Stylesheet id="fontawsome" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
         <Title text="Axum bank"/>
         <Router fallback=|| {
-            view! {<FallbackPage />}.into_view()
+            view! { <FallbackPage />}.into_view()
         }>
+        <div class="animation">
             <NavBar />
-            <div class="animation">
-                <Routes>
+            <Routes>
                     <Route path="" view=|| view! {<HomePage/> }/>
 
                     <Route path="/transactions" view=|| view! { 
                         <RequireLoginWithRedirect>
                             <Outlet />
-                            <TransactionsPage/>
+                            <TransactionsPage />
                         </RequireLoginWithRedirect> 
                     }>
                         <Route path="/" view=|| view! {} />
@@ -65,15 +70,16 @@ pub fn App() -> impl IntoView {
                         <Route path="withdraw/" view=move || view! { <WithrawOrderPopUp withdraw_order_action=withdraw_order_action /> } />
                     </Route>
                     
-                    <Route path="/currency_exchange" view=|| view! { 
+                    <Route path="/currency_exchange/" view=|| view! { 
                         <RequireLoginWithRedirect>
                             <Outlet />
                             <CurrencyExchangePage />
                         </RequireLoginWithRedirect> 
                     }>
                         <Route path="/" view=|| view! {} />
-                        <Route path="new_exchange_order/" view=move || view! { <CreateExchangeListingPopUp /> } />
-                        // <Route path="exchange/" view=move || view! { <WithrawOrderPopUp withdraw_order_action=withdraw_order_action /> } />
+                        <Route path="new_exchange_order/" view=move || view! { <CreateExchangeListingPopUp new_exchange_order_action=new_exchange_order_action /> } />
+                        <Route path="exchange/:id" view=move || view! {  } />
+                        <Route path="delete/:id" view=move || view! { <DeleteExchangeListingPopUp /> } />
                     </Route>
 
 

@@ -129,7 +129,8 @@ fn Transactions() -> impl IntoView{
     // use crate::server::transactions::TransactionStatus;
 
     let (filter_status, set_filter_status) = create_signal(false);
-    let balances = create_resource(|| (), move |_| {
+    // WHY THE FUCK IS THIS NOT WORKING WITH NORMAL RESOURCE GOD ONLY KNOWS
+    let transactions = create_local_resource(|| (), move |_| {
         use crate::server::transactions::get_user_transactions;
         get_user_transactions()
     });
@@ -172,27 +173,20 @@ fn Transactions() -> impl IntoView{
 
         <div class="transactions-wrapper">
             <div class="collumn-name" id="more-info">"Informacje"</div>
-    
             <div class="collumn-name" id="sender">"Nadawca"</div>
-
             <div class="collumn-name" id="reciver">"Odbiorca"</div>
-    
             <div class="collumn-name" id="ammount">"Kwota"</div>
-    
             <div class="collumn-name" id="currency">"Waluta"</div>
-
             <div class="collumn-name" id="title">"Tytuł przelewu"</div>
-    
             <div class="collumn-name" id="date">"Data"</div>
-    
             // TODO ADD LINK WITH MORE INFO
             <div class="more-info"><a href="% transaction.transaction_id %">"Więcej Informacji"</a></div>
 
             // TODO FIX TRANSACTION DISPLAY STYLE``
-            <Transition fallback=move || view! {<p>"Loading..."</p> }>
+            <Suspense fallback=move || view! {<p>"Loading..."</p> }>
             {move || {
                 let transactions_view = {move || {
-                    balances.get().map(move |res| match res {
+                    transactions.get().map(move |res| match res {
                         Ok(transactions_list) => {
                             transactions_list.into_iter().map(move |transaction|{
                                 let trans_type = transaction.transaction_type.clone();
@@ -237,7 +231,7 @@ fn Transactions() -> impl IntoView{
                 }
                 }
             }
-            </Transition>
+            </Suspense>
         </div>
     </div>
     }
