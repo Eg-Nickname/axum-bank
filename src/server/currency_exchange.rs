@@ -188,6 +188,37 @@ cfg_if! {
 
             Ok(())
         }
+
+        #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+        struct ValidatedExchangeListingsQueryData{
+            currency_code_from: String,
+            currency_code_to: String,
+            min_amount_from: i64,
+            min_amount_to: i64
+        }
+        impl ExchangeListingsQueryData{
+            async fn validate(self) -> Result<ValidatedExchangeListingsQueryData, ServerFnError>{
+                let pool = pool()?;
+
+                let currency_from_code = match sqlx::query_as!(CurrencyCode, "SELECT code FROM currencies WHERE code= $1", self.currency_code_from).fetch_one(&pool).await {
+                    Err(_) => "%".to_string(),
+                    Ok(currency) => currency.code
+                };
+
+                let currency_to_code = match sqlx::query_as!(CurrencyCode, "SELECT code FROM currencies WHERE code= $1", self.currency_code_to).fetch_one(&pool).await {
+                    Err(_) => "%".to_string(),
+                    Ok(currency) => currency.code
+                };
+
+                Ok(ValidatedExchangeListingsQueryData{
+                    currency_code_from: currency_from_code,
+                    currency_code_to: currency_to_code,
+                    min_amount_from: self.min_amount_from,
+                    min_amount_to: self.min_amount_to
+                })
+            }
+        }
+        
     }
 }
 
@@ -231,6 +262,14 @@ pub async fn delete_exchange_listing(listing_id: i64) -> Result<(), ServerFnErro
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ExchangeListingsQueryData{
+    pub currency_code_from: String,
+    pub currency_code_to: String,
+    pub min_amount_from: i64,
+    pub min_amount_to: i64
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "ssr", derive(sqlx::FromRow))]
 pub struct ExchangeListing {
     pub id: i64,
@@ -243,10 +282,42 @@ pub struct ExchangeListing {
     pub ratio_from: i64,
     pub ratio_to: i64,
 }
+#[server(GetExchangeListing, "/api")]
+pub async fn get_exchange_listing(listing_id: i64) -> Result<ExchangeListing, ServerFnError> {
+    let pool = pool()?;
+
+    match sqlx::query_as!(
+        ExchangeListing,
+        r#"SELECT 
+        cel.id as id,
+        users.id as listing_creator_id, 
+        users.username as listing_creator_username, 
+        cur_from.code as currency_from_code, 
+        cur_to.code as currency_to_code, 
+        cel.amount_from, 
+        cel.amount_to, 
+        cel.ratio_from, 
+        cel.ratio_to
+        
+        FROM currency_exchange_listings as cel 
+        JOIN users ON cel.listing_creator = users.id
+        JOIN currencies as cur_from ON cel.currency_from_id = cur_from.id
+        JOIN currencies as cur_to ON cel.currency_to_id = cur_to.id
+
+        WHERE cel.id = $1
+        "#,
+        listing_id
+    ).fetch_one(&pool).await{
+        Ok(listing) => Ok(listing),
+        Err(_) =>  Err(ServerFnError::ServerError("Can't get listing with id: {listing_id}.".to_string()))
+    }
+}
 
 #[server(GetExchangeListings, "/api")]
-pub async fn get_exchange_listings() -> Result<Vec<ExchangeListing>, ServerFnError> {
+pub async fn get_exchange_listings(querry_data: ExchangeListingsQueryData) -> Result<Vec<ExchangeListing>, ServerFnError> {
     let pool = pool()?;
+
+    let validated_querry_data = querry_data.validate().await?;
 
     let mut exchange_listings = Vec::new();
     let mut rows = sqlx::query_as!(
@@ -260,13 +331,23 @@ pub async fn get_exchange_listings() -> Result<Vec<ExchangeListing>, ServerFnErr
         cel.amount_from, 
         cel.amount_to, 
         cel.ratio_from, 
-        cel.ratio_to 
-
+        cel.ratio_to
+        
         FROM currency_exchange_listings as cel 
         JOIN users ON cel.listing_creator = users.id
         JOIN currencies as cur_from ON cel.currency_from_id = cur_from.id
         JOIN currencies as cur_to ON cel.currency_to_id = cur_to.id
+
+        WHERE cel.amount_from >= $1
+        AND cel.amount_to >= $2
+        AND cur_from.code LIKE $3
+        AND cur_to.code LIKE $4
+        ORDER BY CAST(cel.ratio_to AS DOUBLE PRECISION)/cel.ratio_from DESC NULLS LAST
         "#,
+        validated_querry_data.min_amount_from,
+        validated_querry_data.min_amount_to,
+        validated_querry_data.currency_code_from,
+        validated_querry_data.currency_code_to,
     ).fetch(&pool);
 
     use futures::TryStreamExt;
@@ -274,4 +355,17 @@ pub async fn get_exchange_listings() -> Result<Vec<ExchangeListing>, ServerFnErr
         exchange_listings.push(row);
     }
     Ok(exchange_listings)
+}
+
+#[server(UserExchangeCurrencies, "/api")]
+pub async fn use_exchange_listing(_listing_id: i64) -> Result<(), ServerFnError>{
+    match get_user().await {
+        Ok(Some(_user)) => {
+            leptos_axum::redirect("/currency_exchange");
+            Ok(())
+        },
+        _ => {
+            Err(ServerFnError::ServerError("Can't get user to exchange_currencies.".to_string()))
+        },
+    }
 }

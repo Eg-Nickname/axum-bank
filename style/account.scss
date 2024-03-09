@@ -21,19 +21,6 @@ ul{
 a{
     text-decoration: none;
 }
-.div-menu{
-    margin-top: -10px;
-    position: absolute;
-    width: 100%;
-
-    z-index: 20;
-    }
-
-.navigation--active{
-    overflow-y: visible;
-    z-index: 213;
-}
-/* pojemniki */
 
 .container{
     position: relative;
@@ -44,112 +31,7 @@ a{
     z-index: 6;
 }
 
-.form-box{
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-}
-
-/* to smieszne krzywe cos */
-
-.container::before{
-    content: '';
-    position: absolute;
-    height: 2550px;
-    width: 2000px;
-    top: -10%;
-    right: 48%;
-    background-image: linear-gradient(-45deg, #6a4edc 0%, #6a4edc 100%);
-    transform: translateY(-50%);
-    border-radius: 50%;
-    
-}
-
-/* ikonki top */
-
-.home{
-    position: absolute;
-    left: 2%;
-    top: 2%;
-    width:40px;
-    height:40px;
-    border-radius: 20px;
-    background-color: white;
-    text-align: center;
-    line-height: 40px;
-    z-index: 10;
-    transition: all 0.8s ease-in-out;
-}
-
-.menu-home{
-    position: absolute;
-    left: 2%;
-    top: 2%;
-    z-index: 10;
-}
-
-.menu-left{
-    position: absolute;
-    right: 2%;
-    top: 2%;
-    z-index: 10;
-    height: 117px;
-    padding: 35px
-}
-
-.logowanie-white{
-    font-weight: bold;
-    color: #6a4edc;
-    height: 40px;
-    margin-right: 40px;
-}
-
-.logowanie-white a{
-    padding: 10px;
-    border:2px solid #6a4edc;
-    border-radius: 30px;
-    color: #6a4edc;
-}
-.logowanie-white a:hover{
-    color: #FFF;
-}
-.logowanie-white a:hover{
-    border: 3px solid #6a4edc;
-    background-color: #6a4edc;
-    transition-duration: 250ms;
-}
-.logowanie-white li:hover{
-    transition-duration: 250ms;
-}
-
-.home i{
-    color: #7c63e0;
-    font-size: 18px;
-
-}
-
-.home:hover{
-    transform: scale(1.3);
-}
-
-.company-logo{
-    position: absolute;
-    right: 2%;
-    top: 2%;
-    z-index: 10;
-    width:90px;
-    height:90px;
-}
-
-.company-logo img{
-    height: 80px;
-    width: auto;
-}
-
 /* pole logowania */
-
 form{
     display: flex;
     flex-direction: column;
@@ -158,12 +40,6 @@ form{
     padding: 0 50px;
     grid-column: 1 / 2;
     grid-row: 1 / 2;
-}
-
-.title{
-    font-size: 38px;
-    color: #444;
-    margin-bottom: 10px;
 }
 
 .input-box{
@@ -184,32 +60,6 @@ form{
     color: #7c63e0;
     font-size: 18px;
 }
-input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
-input:-webkit-autofill:active,
-.input-box input{
-    background: none !important;
-    background-color: transparent !important;
-    outline: none;
-    border: none;
-    line-height: 1;
-    font-weight: 600;
-    font-size: 22px;
-    color: black;
-    border-radius: 55px;
-    font-family: 'Spectral', serif;
-    -webkit-box-shadow: 0 0 0 30px #f0f0f0 inset !important;
-    box-shadow: 0 0 0 30px #f0f0f0 inset !important;
-}
-
-input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
-input:-webkit-autofill:active{
-    color: #7c63e0;
-}
-
 
 .input-box input:placeholder-shown{
     color: #7c63e0;
@@ -236,242 +86,15 @@ input:-webkit-autofill:active{
     color: #7c63e0;
     border: 2px solid #7c63e0;
 }
+
 /* Podpowiedzi */
 .help-text li+li{
     margin: 10px 0;
+
 }
 .help-text{
     width: 100%;
 }
 .register-error{
     color: red;
-}
-
-
-/* polozenie formularza logowania */
-
-.sign-in{
-    position: absolute;
-    top: 50%;
-    left: 75%;
-    transform: translate(-50%, -50%);
-    display: grid;
-    grid-template-columns: 1fr;
-    z-index: 5;
-
-}
-
-form.sign-in-form{
-    z-index: 2;
-}
-
-/* form.sign-up-form{
-    z-index: 1;
-    opacity: 0;
-} */
-
-
-/* lewa strona jeden dupny panel, ktorzy trzyma wszystko w sobie */
-
-.image{
-    width: 65%;
-    padding-top: 5rem;
-}
-
-.image2{
-    width: 35%;
-    padding-top: 10rem;
-    margin-left: 30rem;
-}
-
-.panels-box{
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr)
-}
-
-.panel{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    z-index: 7;
-}
-
-.panel-left{
-    padding: 3rem 12% 2rem 17%;
-}
-
-/* .panel-right{
-    padding: 30px 12% 20px 17%;
-} */
-
-.panel .content{
-    color: #fff;
-}
-
-.panel h3{
-    font-weight: 600;
-    line-height:1;
-    font-size: 24px;
-}
-
-.panel p{
-    font-size: 16px;
-    padding: 10px 0 20px 0;
-}
-
-.button{
-    font-weight: bold;
-    color: whitesmoke;
-    height: 30px;
-    padding: 10px;
-    border:2px solid white;
-    border-radius: 30px;
-}
-.button:hover{
-    border: 3px solid white;
-    background-color: white;
-    color: #7c63e0;
-    transition-duration: 500ms;
-}
-
-
-/* .panel-right .content, .panel-right .image{
-    transform: translateX(800px);
-} */
-
-
-/* Menu Ustawienia */
-.logowanie{
-    font-weight: bold;
-    color: whitesmoke;
-    height: 40px;
-    margin-right: 40px;
-}
-
-.logowanie a{
-    padding: 10px;
-    border:2px solid #7c63e0;
-    background: #7c63e0;
-    border-radius: 30px;
-}
-.logowanie a:hover{
-    color: #7c63e0;
-}
-.logowanie a:hover{
-    border: 3px solid #7c63e0;
-    background-color: white;
-    transition-duration: 250ms;
-}
-.logowanie li:hover{
-    transition-duration: 250ms;
-}
-
-/* Menu */
-.menu-li:after {
-  padding-bottom: 5px;
-  display: block;
-  content: '';
-  border-bottom: solid 3px white;  
-  transform: scaleX(0);  
-  transition: transform 250ms ease-in-out;
-}
-.menu-li:hover:after{ transform: scaleX(1); }
-
-.menu-text{
-    color: white;
-    font-weight: 600;
-}
-
-.spacer{
-    display: none;
-}
-
-
-@media(max-width: 900px){
-    .home{
-        background-color: #7c63e0;;
-    }
-    .home i{
-        color: white;
-    }
-    /* Menu */
-    .menu-li:after {
-    padding-bottom: 5px;
-    display: block;
-    content: '';
-    border-bottom: solid 3px black;  
-  }
-  
-  .menu-text{
-      color: black;
-  }
-    .panel{
-        max-width: 100vw;
-    }
-    .spacer{
-        display: block;
-        width: 100%;
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: cover;
-    }
-    .panels-box{
-        grid-template-columns: repeat(1, 1fr);
-        margin-top: 600px;
-        background: #6a4edc;
-        position: relative;
-    }
-    .content{
-        max-width: 400px;
-        width: auto;
-    }
-    .panel-left{
-        padding-left: 5%;
-        padding-right: 5%;
-        width: auto;
-    }
-    .image{
-        padding-top: 3rem;
-    }
-    .sign-in{
-        width: 100%;
-        left: 50%;
-        top: 32%
-    }
-    .register{
-        width: 100%;
-        left: 50%;
-        top: 560px;
-    }
-    .panel-box-register{
-        margin-top: 900px;
-    }
-    .form-box{
-        background: white;
-    }
-    .help-text{
-        max-width: 300px;
-    }
-}
-
-@media(max-width: 470px){
-    .title{
-        font-size: 30px;
-    }
-    .panel{
-        max-width: 100vw;
-    }
-    .content{
-        width: 300px;
-    }
-    .sign-in{
-        top: 37%;
-    }
 }

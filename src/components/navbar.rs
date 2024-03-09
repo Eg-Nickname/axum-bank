@@ -29,29 +29,32 @@ pub fn NavBar() -> impl IntoView {
                 </ul>
 
                 <ul class="flexBlock logowanie" id="bottom-ul">
-                    <Transition
+                    <Suspense
                         fallback=move || view! {<span>"Loading..."</span>}
                     >
                         {move || {
                             user.get().map(|user| match user {
+                                // Render this if user is logged in
                                 Ok(Some(_user)) => view! {
-                                    <li class="login"><A href="/account/">"Ustawienia"</A></li>
-                                    <li class="login li-responsive"><a rel="external" href="/api/logout">"Wyloguj się"</a></li>
+                                    <li class="login"><A class="transparent-purple-button" href="/account/">"Ustawienia"</A></li>
+                                    <li class="login li-responsive"><a rel="external" class="transparent-purple-button" href="/api/logout">"Wyloguj się"</a></li>
                                     // TODO ADD ADMIN DASHBOARD LINK
                                     // {% if user.is_superuser %}
                                     // <li class="li-nav"><A class="link" href="/admindashboard/">"Admin Panel"</A></li>
                                     // {% endif %}
                                 }.into_view(),
-                                _ => view! {
-                                    warn!("mogus")
-                                    <li>
-                                        <li class="login"><A href="/login/">"Zaloguj się"</A></li>
-                                        <li class="login"><A href="/signup/">"Zarejestruj się"</A></li>
-                                    </li>
+                                
+                                // Render this if user is not logged in
+                                Ok(None) => view!{
+                                    <li class="login"><A class="transparent-purple-button" href="/login/">"Zaloguj się"</A></li>
+                                    <li class="login"><A class="transparent-purple-button" href="/signup/">"Zarejestruj się"</A></li>
                                 }.into_view(),
+
+                                // Else render nothing
+                                _ => view! {}.into_view(),
                             })
                         }}
-                    </Transition>
+                    </Suspense>
                 </ul>
             </div>
         </nav>

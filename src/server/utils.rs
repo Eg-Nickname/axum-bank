@@ -7,6 +7,9 @@ cfg_if! {
         pub struct CurrencyId{
             pub id: i64,
         }
+        pub struct CurrencyCode{
+            pub code: String,
+        }
     
         pub struct UserCurrencyBalance{
             #[allow(dead_code)]

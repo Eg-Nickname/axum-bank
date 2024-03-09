@@ -74,49 +74,6 @@ body{
     font-weight: 600;
 }
 
-.new-transaction-form .transaction-input{
-    width: 300px;
-    padding: 0 20px;
-    width: 256px;
-    color: #444;
-    line-height: 28px;
-    border: 1px solid #aaa;
-    border-radius: 4px;
-    transition: 300ms all;
-}
-
-.new-transaction-form .transaction-input:focus {
-    border: 2px solid $primary-hover !important;
-}
-
-
-.new-transaction-form .transaction-input:hover {
-    border: 2px solid $primary-border;
-}
-
-// #id_waluta, #id_waluta2, #id_daterange{
-//     width: 300px;
-// }
-
-// #NewTransaction_reciver_id{
-//     width: 300px;
-// }
-
-// #NewTransaction_title{
-//     width: 300px;
-// }
-// #NewTransaction_kwota,  #NewTransaction_title{
-//     padding: 0 20px;
-//     width: 256px;
-//     color: #444;
-//     line-height: 28px;
-//     border: 1px solid #aaa;
-//     border-radius: 4px;
-// }
-// #NewTransaction_waluta, #NewTransaction_waluta2{
-//     width: 300px;
-// }
-
 .help-text{
     max-width: 300px;
     margin-top: 10px;
@@ -262,10 +219,11 @@ input:checked + .slider:before {
 }
 .transactions-wrapper{
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 60px minmax(0, 2fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 71px minmax(0, 2fr) minmax(0, 1fr);
     grid-auto-rows: minmax(50px auto);
-    row-gap: 16px;
-    column-gap: 16px;
+    row-gap: 1px;
+    column-gap: 1px;
+    background-color: #aaa;
 }
 
 .transactions-wrapper .collumn-name{
@@ -273,10 +231,11 @@ input:checked + .slider:before {
     color: $neutral-700;
     font-weight: 600;
     display: flex;
-    justify-content: center;
 }
 
 .transactions-wrapper div{
+    background-color: #fff;
+    padding: 6px;
     overflow-wrap: break-word;
 }
 

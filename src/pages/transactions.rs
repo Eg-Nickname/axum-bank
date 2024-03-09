@@ -2,6 +2,8 @@ use leptos::*;
 use leptos_router::*;
 
 use crate::server::transactions::{NewUserTransaction, WithdrawOrder};
+use crate::auth::User;
+
 #[component]
 pub fn NewTransactionPopUp(new_transaction_action: Action<NewUserTransaction, Result<(), ServerFnError>>) -> impl IntoView{
     view! {
@@ -13,24 +15,24 @@ pub fn NewTransactionPopUp(new_transaction_action: Action<NewUserTransaction, Re
                 <h1>"Nowy Przelew"</h1>
                 <div class="input-box1">
                     <i>"Tytuł przelewu:"</i>
-                    <input type="text" placeholder="Tytuł" name="title" class="transaction-input" />
+                    <input type="text" placeholder="Tytuł" name="title" class="text-input" />
                 </div>
                 <div class="transacition-input-box">
                     // TODO Add username suggestion while inputing
                     <i>"Nazwa odbiorcy:"</i>
-                    <input type="text" placeholder="Reciver username" maxlength="32" name="reciver_username" class="transaction-input" />
+                    <input type="text" placeholder="Nazwa odbiorcy" maxlength="32" name="reciver_username" class="text-input" />
                 </div>
                 <div class="transacition-input-box">
                     // TODO change to custom select implementation
                     <i>"Waluta"</i>
-                    <input type="text" placeholder="cny" maxlength="32" name="currency_code" class="transaction-input" />
+                    <input type="text" placeholder="cny" maxlength="32" name="currency_code" class="text-input" />
                 </div>
                 <div class="transacition-input-box">
                     <i>"Kwota"</i>
-                    <input type="number" placeholder="0" name="amount" class="transaction-input" />
+                    <input type="number" placeholder="0" name="amount" class="text-input" />
                 </div>
                 <div class="transacition-input-box">
-                    <input type="submit" class="buton-przelew" value="Wyslij przelew" name="transaction" />
+                    <input type="submit" class="solid-purple-button" value="Wyslij przelew" name="transaction" />
                 </div>
 
             </ActionForm>
@@ -49,21 +51,21 @@ pub fn WithrawOrderPopUp(withdraw_order_action: Action<WithdrawOrder, Result<(),
 
                 <ActionForm action=withdraw_order_action class="new-transaction-form">
                     <h1>"Wypłać pieniądze"</h1>
-                    <div class="input-box1">
+                    <div class="transacition-input-box">
                         <i>"Nick z serwera:"</i>
-                        <input type="text" placeholder="Nick z serwera" name="withdrawer_nick" class="transaction-input" />
+                        <input type="text" placeholder="Nick z serwera" name="withdrawer_nick" class="text-input" />
                     </div>
                     <div class="transacition-input-box">
                         // TODO change to custom select implementation
                         <i>"Waluta"</i>
-                        <input type="text" placeholder="cny" maxlength="32" name="currency_code" class="transaction-input" />
+                        <input type="text" placeholder="cny" maxlength="32" name="currency_code" class="text-input" />
                     </div>
                     <div class="transacition-input-box">
                         <i>"Kwota"</i>
-                        <input type="number" placeholder="0" name="amount" class="transaction-input" />
+                        <input type="number" placeholder="0" name="amount" class="text-input" />
                     </div>
                     <div class="transacition-input-box">
-                        <input type="submit" class="buton-przelew" value="Wypłać pieniądze" name="transaction" />
+                        <input type="submit" class="solid-purple-button" value="Wypłać pieniądze" name="transaction" />
                     </div>
 
                 </ActionForm>
@@ -86,10 +88,10 @@ fn AccountBalance() -> impl IntoView{
             <div class="informacje">
                 <h2>"Stan konta"</h2> 
                 <div class="flexBlock">
-                    <A class="link-button action-button" href="new_transaction"><i class="fas fa-plus"></i>"Nowy Przelew"</A>
+                    <A class="solid-purple-button" href="new_transaction"><i class="fas fa-plus"></i>"Nowy Przelew"</A>
                 </div>
                 <div class="flexBlock buttongroup">
-                    <A class="link-button action-button" href="withdraw"><i class="fas fa-money-bill-wave"></i>"Wypłata z konta"</A>
+                    <A class="solid-purple-button" href="withdraw"><i class="fas fa-money-bill-wave"></i>"Wypłata z konta"</A>
                 </div>
                 <div class="currency-wrapper">
                 <Transition fallback=move || view! {<p>"Loading..."</p> }>
@@ -135,6 +137,8 @@ fn Transactions() -> impl IntoView{
         get_user_transactions()
     });
 
+    let user = use_context::<Resource<(usize, usize, usize), Result<Option<User>, ServerFnError>>>().expect("User resource shoud have been provided.");
+
     view!{
         <div class="transactions-container">
         <h1>"Transakcje"</h1>
@@ -161,7 +165,7 @@ fn Transactions() -> impl IntoView{
                         //         <p class="login-error">{{error}}</p>
                         //     {% endfor %}
                         // {% endfor %}
-                        <button type="submit" class="buton-przelew nowy-przelew">"Filtruj"</button>
+                        <button type="submit" class="solid-purple-button">"Filtruj"</button>
                     </form>
                 </div>
                 }
@@ -185,11 +189,17 @@ fn Transactions() -> impl IntoView{
             // TODO FIX TRANSACTION DISPLAY STYLE``
             <Suspense fallback=move || view! {<p>"Loading..."</p> }>
             {move || {
+                let current_user_id: Option<i64> = user.get().map(|user| match user {
+                    Ok(Some(user)) => user.id,
+                    _ => -1 ,
+                });
+
                 let transactions_view = {move || {
                     transactions.get().map(move |res| match res {
                         Ok(transactions_list) => {
                             transactions_list.into_iter().map(move |transaction|{
                                 let trans_type = transaction.transaction_type.clone();
+                                let reciver_for_withdraw = transaction.title.clone();
                                 view!{ 
                                     // {transaction.id}
                                     {move ||{
@@ -198,13 +208,19 @@ fn Transactions() -> impl IntoView{
                                                 <div class="sender">{transaction.sender_username.clone().unwrap_or("Użytkownik usunięty".to_string())}</div>
                                                 <div class="reciver">{transaction.reciver_username.clone().unwrap_or("Użytkownik usunięty".to_string())}</div>
                                             }.into_view(),
-                                            TransactionType::Withdraw | TransactionType::Payment | TransactionType::Other => view! {<div class="sender"></div><div class="reciver"></div>}.into_view(),
+                                            TransactionType::Withdraw => view! {<div class="sender"></div><div class="reciver">{reciver_for_withdraw.clone()}</div>}.into_view(),
+                                            TransactionType::Payment | TransactionType::Other => view! {<div class="sender"></div><div class="reciver"></div>}.into_view(),
                                         }
                                     }}
 
-                                    // TODO Check if user is sender or reciever of transaction
-                                    <div><a style="color: red;">"-"{transaction.amount}</a></div>
-                                    // <div><a style="color: rgb(0, 173, 0);">"+"{transaction.amount}</a></div>
+                                    // Checks if current user is sender or reciver
+                                    {move ||{
+                                        if transaction.sender_id.unwrap_or(-2) == current_user_id.unwrap_or(-1){
+                                            view! {<div><a style="color: red;">"-"{transaction.amount}</a></div>}
+                                        }else{
+                                            view! {<div><a style="color: rgb(0, 173, 0);">"+"{transaction.amount}</a></div>}
+                                        }
+                                    }}
                                     
                                     <div class="currency"><a>{transaction.currency_code}</a></div>
 

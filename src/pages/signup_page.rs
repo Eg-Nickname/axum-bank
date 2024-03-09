@@ -8,29 +8,32 @@ pub fn SignupPage(
 ) -> impl IntoView {
     view! {
         <ActionForm action=action>
-            <h1>"Sign Up"</h1>
-            <label>
-                "User ID:"
-                <input type="text" placeholder="User ID" maxlength="32" name="username" class="auth-input" />
-            </label>
-            <br/>
-            <label>
-                "Password:"
-                <input type="password" placeholder="Password" name="password" class="auth-input" />
-            </label>
-            <br/>
-            <label>
-                "Confirm Password:"
-                <input type="password" placeholder="Password again" name="password_confirmation" class="auth-input" />
-            </label>
-            <br/>
-            <label>
-                "Remember me?"
-                <input type="checkbox" name="remember" class="auth-input" />
-            </label>
+            <h2>"Zarejestruj się"</h2>
+            <div>
+                <i class="fas fa-user"></i>
+                " Login"
+                <input type="text" placeholder="Login" maxlength="32" name="username" class="auth-input" />
+            </div>
 
-            <br/>
-            <button type="submit">"Sign Up"</button>
+            <div>
+                <i class="fas fa-lock"></i>
+                " Hasło"
+                <input type="password" placeholder="Hasło" name="password" class="auth-input" />
+            </div>
+
+            <div>
+                <i class="fas fa-lock"></i>
+                " Potwierdź hasło"
+                <input type="password" placeholder="Hasło" name="password_confirmation" class="auth-input" />
+            </div>
+
+
+            <div>
+            "Zapamiętaj mnie"
+                <input type="checkbox" name="remember" class="auth-input" />
+            </div>
+
+            <input type="submit" class="solid-purple-button" value="Rejestruj" name="transaction" />
         </ActionForm>
     }
 }

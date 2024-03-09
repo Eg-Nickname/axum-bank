@@ -16,7 +16,9 @@ use crate::pages::transactions::{NewTransactionPopUp, WithrawOrderPopUp};
 
 use crate::pages::currency_exchange::CurrencyExchangePage;
 use crate::pages::currency_exchange::CreateExchangeListingPopUp;
-use crate::pages::currency_exchange::DeleteExchangeListingPopUp;
+use crate::pages::currency_exchange::DeleteExchangeListingPopUp; 
+use crate::pages::currency_exchange::InspectExchangeListingPopUp;
+
 
 
 #[component]
@@ -54,7 +56,6 @@ pub fn App() -> impl IntoView {
         <Router fallback=|| {
             view! { <FallbackPage />}.into_view()
         }>
-        <div class="animation">
             <NavBar />
             <Routes>
                     <Route path="" view=|| view! {<HomePage/> }/>
@@ -78,7 +79,7 @@ pub fn App() -> impl IntoView {
                     }>
                         <Route path="/" view=|| view! {} />
                         <Route path="new_exchange_order/" view=move || view! { <CreateExchangeListingPopUp new_exchange_order_action=new_exchange_order_action /> } />
-                        <Route path="exchange/:id" view=move || view! {  } />
+                        <Route path="exchange/:id" view=move || view! { <InspectExchangeListingPopUp />  } />
                         <Route path="delete/:id" view=move || view! { <DeleteExchangeListingPopUp /> } />
                     </Route>
 
@@ -90,7 +91,6 @@ pub fn App() -> impl IntoView {
                         <LoginPage action=login />
                     }/>
                 </Routes>
-            </div>
         </Router>
     }
 }

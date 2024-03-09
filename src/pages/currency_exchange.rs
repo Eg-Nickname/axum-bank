@@ -1,13 +1,72 @@
 use leptos::*;
 use leptos_router::*;
-use crate::server::currency_exchange::{CreateExchangeListing, DeleteExchangeListing};
+use crate::server::currency_exchange::{CreateExchangeListing, DeleteExchangeListing, UserExchangeCurrencies};
+use crate::server::currency_exchange::get_exchange_listings;
+use crate::server::currency_exchange::get_exchange_listing;
+
 use crate::auth::User;
 
-
+#[derive(Params, PartialEq, Clone)]
+struct ListingParams {
+    id: i64
+}
 
 #[component]
-fn InspectExchangeListing() -> impl IntoView{
+pub fn InspectExchangeListingPopUp() -> impl IntoView{
+    let params = use_params::<ListingParams>();
+    let listing_id = move || {
+        params.with(|params| {
+            params.as_ref()
+                .map(|params| params.id)
+                .unwrap_or(-1)
+        })
+    };
+
+    let action = create_server_action::<UserExchangeCurrencies>();
+
+    let _listing = create_resource(listing_id, move |_| {
+        get_exchange_listing(listing_id())
+    });
+
     view! {
+        <div class="popup active">
+        <A href="/currency_exchange"><div class="overlay"></div></A>
+        <div class="content-popup">
+        <ActionForm action=action>
+            <h1>"Czy chcesz wymienić waluty?"</h1>
+            // DISPLAY LISING INFO - currency from/to, ratio, amounts you can exchange
+
+            // CURRENCY FROM INPUT WITH MIN/MAX STEP OF RATIO FROM | oninput automaticly update second field to display how much of currency you will recive
+            // CURRENCY TO INPUT WITH MIN/MAX STEP OF RATIO TO | oninput automaticly update second field to display how much of currency you will recive
+
+            // UPDATE SECOND INPUT JUST WITH JAVASCRIPT :skull: with onlick=" --js code goes here-- "
+            { view!{
+            <div class="transacition-input-box">
+                <i>"Kwota z"</i>
+                <input type="number" value=0 name="amount_exchange_from" step=1 min=0 /> //step={lising.ratio_from}
+            </div> 
+            }}
+
+            <div class="transacition-input-box">
+                <i>"Kwota na"</i>
+                <input type="number" value="0" name="amount_exchange_to" step=2 min=0 /> // step={lising.ratio_to}
+            </div> 
+
+            <div class="transacition-input-box">
+                <input type="hidden" value={listing_id} name="listing_id" />
+                <input type="submit" value="Wymień" class="solid-purple-button"/>
+            </div> 
+
+
+        </ActionForm>
+
+        <A href="/currency_exchange"><div class="close-bnt"><i class="fa-solid fa-xmark"></i></div></A>
+        </div>
+        </div>
+    }
+
+
+    // view! {
     // {%if selected_exchange_listing %}
 
     // <div class="popup active" id="popup-2">
@@ -50,13 +109,9 @@ fn InspectExchangeListing() -> impl IntoView{
     //     </div>
     // </div>
     // {%endif%}
-    }
+    // }
 }
 
-#[derive(Params, PartialEq, Clone)]
-struct ListingParams {
-    id: i64
-}
 
 #[component]
 pub fn DeleteExchangeListingPopUp() -> impl IntoView{
@@ -73,6 +128,7 @@ pub fn DeleteExchangeListingPopUp() -> impl IntoView{
     view! {
         <div class="popup active">
         <A href="/currency_exchange"><div class="overlay"></div></A>
+        
 
         <div class="content-popup">
         <ActionForm action=action>
@@ -80,7 +136,7 @@ pub fn DeleteExchangeListingPopUp() -> impl IntoView{
             <div class="delete_exchange_listing_form">
                 <input type="hidden" value={listing_id} name="listing_id" />
                 <input type="submit" value="Usuń" class="button-del link-button"/>
-                <A href="/currency_exchange" class="link-button">"Rezygnuje"</A>
+                <A href="/currency_exchange" class="solid-purple-button">"Rezygnuje"</A>
             </div> 
         </ActionForm>
 
@@ -95,33 +151,30 @@ pub fn CreateExchangeListingPopUp(new_exchange_order_action:  Action<CreateExcha
     view!{
         <div class="popup active">
         <A href="/currency_exchange"><div class="overlay"></div></A>
-        
             
         <div class="content-popup">
             <ActionForm action=new_exchange_order_action>
                 <h1>"Wymień waluty"</h1>
-
-                // TODO fix transaction-input-box class name
                 // TODO update to select like component
                 <div class="transacition-input-box">
                     <i>"Waluta Z"</i>
-                    <input type="text" placeholder="CNY" name="currency_code_from" class="transaction-input" />
+                    <input type="text" placeholder="CNY" name="currency_code_from" class="text-input" />
                 </div>
                 <div class="transacition-input-box">
                     <i>"Kwota Z"</i>
-                    <input type="number" placeholder="0" name="amount_from" class="transaction-input" />
+                    <input type="number" placeholder="0" name="amount_from" class="text-input" min=0 />
                 </div>
                 <div class="transacition-input-box">
                     <i>"Waluta Na"</i>
-                    <input type="text" placeholder="RUB" name="currency_code_to" class="transaction-input" />
+                    <input type="text" placeholder="RUB" name="currency_code_to" class="text-input" />
                 </div>
                 <div class="transacition-input-box">
                     <i>"Kwota Na"</i>
-                    <input type="number" placeholder="0" name="amount_to" class="transaction-input" />
+                    <input type="number" placeholder="0" name="amount_to" class="text-input" min=0 />
                 </div>
 
                 <div class="transacition-input-box">
-                    <input type="submit" class="buton-przelew" value="Wymień" name="transaction" />
+                    <input type="submit" class="solid-purple-button" value="Wymień" name="transaction" />
                 </div>
             </ActionForm>
             
@@ -135,27 +188,39 @@ pub fn CreateExchangeListingPopUp(new_exchange_order_action:  Action<CreateExcha
 pub fn CurrencyExchangePage() -> impl IntoView{
     view!{
         <div class="content">
-            <ExchangeListings />
-            //     <div class="exchange-info-container">
-            //         <h2>Wymień waluty</h2> <button onclick="togglePopup()" class="buton-przelew button-oferawymiany"><i class="fas fa-plus"></i>Nowa Oferta Wymiany Walut</button>
+                <div class="exchange-info-container">
+                    <h2>"Wymień waluty"</h2> <A href="./new_exchange_order" class="solid-purple-button"><i class="fas fa-plus"></i>"Nowa Oferta Wymiany Walut"</A>
 
-            //         <form method="get">
-            //             {% for field in exchangelisting_filter.form %}
-                        
-            //             <div class="input-box filter-box">
-            //                 <i>{{field.label}}:</i>
-            //                 <br>
-            //                 {{field}}
-            //             </div>
-                    
-            //             {% for error in transaction_form.field.errors %}
-            //                 <p class="login-error">{{error}}</p>
-            //             {% endfor %}
-            //             {% endfor %}
-            //             <button type="submit" class="buton-przelew nowy-przelew">Filtruj</button>
-            //         </form>
-            //     </div>
-            // </div>
+                    <form method="get">
+                        <div class="transacition-input-box">
+                            <i>"Waluta z"</i>
+                            <input type="text" placeholder="CNY" name="currency_from"/>
+                        </div>
+
+                        <div class="transacition-input-box">
+                            <i>"Waluta na"</i>
+                            <input type="text" placeholder="RUB" name="currency_to"/>
+                        </div>
+
+                        <div class="transacition-input-box">
+                            <i>"Minimalna kwota z"</i>
+                            <input type="number" placeholder="0" name="min_amount_from"/>
+                        </div>
+
+                        <div class="transacition-input-box">
+                            <i>"Minimalna kwota na"</i>
+                            <input type="number" placeholder="0" name="min_amount_to"/>
+                            // <i>"Pozostaw puste jeśli nie chcesz ustawiać minimalnej kwoty wymiany na"</i>
+                        </div>
+                        <div class="transacition-input-box">
+                            <input type="submit" class="solid-purple-button" value="Filtruj" />
+                            <input type="reset" class="transparent-purple-button" value="Resetuj" />
+                        </div>
+
+                    </form>
+                </div>
+
+            <ExchangeListings />
         </div>
     }
 }
@@ -164,9 +229,26 @@ pub fn CurrencyExchangePage() -> impl IntoView{
 fn ExchangeListings() -> impl IntoView{
     let user = use_context::<Resource<(usize, usize, usize), Result<Option<User>, ServerFnError>>>().expect("User resource shoud have been provided.");
 
-    let exchange_listings = create_resource(|| (), move |_| {
-        use crate::server::currency_exchange::get_exchange_listings;
-        get_exchange_listings()
+    let query = use_query_map();
+
+    // Listing filter params
+    let currency_from = move || query().get("currency_from").cloned().unwrap_or_default();
+    let currency_to = move || query().get("currency_to").cloned().unwrap_or_default();
+    let min_amount_from = move || query().get("min_amount_from").cloned().unwrap_or_default();
+    let min_amount_to = move || query().get("min_amount_to").cloned().unwrap_or_default();
+
+    let query_data = create_memo(move |_| {
+        use crate::server::currency_exchange::ExchangeListingsQueryData;
+        ExchangeListingsQueryData{
+            currency_code_from: currency_from(),
+            currency_code_to: currency_to(),
+            min_amount_from: min_amount_from().parse::<i64>().unwrap_or(0),
+            min_amount_to: min_amount_to().parse::<i64>().unwrap_or(0)
+        }
+    });
+
+    let exchange_listings = create_resource(query_data, move |_| {
+        get_exchange_listings(query_data())
     });
 
     view! {
@@ -191,9 +273,9 @@ fn ExchangeListings() -> impl IntoView{
 
                                     {move ||{
                                         if Some(exchange_listing.listing_creator_id) == current_user_id{
-                                            view! {<A href="./delete/".to_string() + &exchange_listing.id.to_string()  class="link-button button-del">"Usuń ofertę wymiany"</A>}
+                                            view! {<A href="./delete/".to_string() + &exchange_listing.id.to_string()  class="button-del">"Usuń ofertę wymiany"</A>}
                                         }else{
-                                            view! {<A href="./exchange/".to_string() + &exchange_listing.id.to_string() class="link-button">"Wymień"</A>}
+                                            view! {<A href="./exchange/".to_string() + &exchange_listing.id.to_string() class="solid-purple-button">"Wymień"</A>}
                                         }
                                     }}
                                 </div>

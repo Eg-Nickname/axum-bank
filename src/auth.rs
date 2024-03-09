@@ -1,5 +1,5 @@
 use cfg_if::cfg_if;
-use leptos::*;
+use leptos::{logging::warn, *};
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
@@ -167,12 +167,13 @@ pub async fn login(
     let pool = pool()?;
     let auth = auth()?;
 
-    let user: User = User::get_from_username(username, &pool)
+    let user: User = User::get_from_username(username.clone(), &pool)
         .await
         .ok_or_else(|| {
+            warn!("User does not exist");
             ServerFnError::ServerError("User does not exist.".into())
         })?;
-
+        warn!("user logged in {}", username);
     match verify(password, &user.password)? {
         true => {
             auth.login_user(user.id);
