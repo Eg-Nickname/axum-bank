@@ -30,6 +30,15 @@ a{
     overflow: hidden;
     z-index: 6;
 }
+// Login page styling
+.login-container, .register-container{
+    margin: 32px;
+}
+.additional-info-container{
+    margin: 0px 32px;
+}
+
+
 
 /* pole logowania */
 form{
