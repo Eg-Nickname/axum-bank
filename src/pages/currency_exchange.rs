@@ -24,7 +24,7 @@ pub fn InspectExchangeListingPopUp() -> impl IntoView{
 
     let action = create_server_action::<UserExchangeCurrencies>();
 
-    let _listing = create_resource(listing_id, move |_| {
+    let listing = create_resource(listing_id, move |_| {
         get_exchange_listing(listing_id())
     });
 
@@ -34,23 +34,30 @@ pub fn InspectExchangeListingPopUp() -> impl IntoView{
         <div class="content-popup">
         <ActionForm action=action>
             <h1>"Czy chcesz wymienić waluty?"</h1>
-            // DISPLAY LISING INFO - currency from/to, ratio, amounts you can exchange
-
-            // CURRENCY FROM INPUT WITH MIN/MAX STEP OF RATIO FROM | oninput automaticly update second field to display how much of currency you will recive
-            // CURRENCY TO INPUT WITH MIN/MAX STEP OF RATIO TO | oninput automaticly update second field to display how much of currency you will recive
-
-            // UPDATE SECOND INPUT JUST WITH JAVASCRIPT :skull: with onlick=" --js code goes here-- "
-            { view!{
-            <div class="transacition-input-box">
-                <i>"Kwota z"</i>
-                <input type="number" value=0 name="amount_exchange_from" step=1 min=0 /> //step={lising.ratio_from}
-            </div> 
-            }}
-
-            <div class="transacition-input-box">
-                <i>"Kwota na"</i>
-                <input type="number" value="0" name="amount_exchange_to" step=2 min=0 /> // step={lising.ratio_to}
-            </div> 
+                <Suspense fallback=move || view! {<p>"Loading..."</p> }>
+                {move||{
+                    match listing.get() {
+                        Some(Ok(listing)) => {
+                            view!{
+                                <div class="transacition-input-box">
+                                    <i>"Maksymalnie " {listing.amount_to} {listing.currency_to_code} " Na " {listing.amount_from} {listing.currency_from_code}</i>
+                                </div>
+                                <div class="transacition-input-box">
+                                    <i>"Kwota z"</i>
+                                    <input type="number" value=0 name="amount_exchange_to" id="ammount_to" step={listing.ratio_to} min=0 max={listing.amount_to} onclick="let inp1=document.getElementById('ammount_to');let inp2=document.getElementById('ammount_from');inp2.value=(inp1.value/inp1.step)*inp2.step" />
+                                </div> 
+                                
+                                <div class="transacition-input-box">
+                                    <i>"Kwota na"</i>
+                                    <input type="number" value="0" name="amount_exchange_from" id="ammount_from" step={listing.ratio_from} min=0 max={listing.amount_from} oninput="let inp3=document.getElementById('ammount_to');let inp4=document.getElementById('ammount_from');inp3.value=(inp4.value/inp4.step)*inp3.step" />
+                                </div> 
+                            }
+                        }.into_view(),
+                        _ => {}.into_view(),
+                    }
+                }
+                }
+                </Suspense>
 
             <div class="transacition-input-box">
                 <input type="hidden" value={listing_id} name="listing_id" />
@@ -63,55 +70,9 @@ pub fn InspectExchangeListingPopUp() -> impl IntoView{
         <A href="/currency_exchange"><div class="close-bnt"><i class="fa-solid fa-xmark"></i></div></A>
         </div>
         </div>
+    
     }
-
-
-    // view! {
-    // {%if selected_exchange_listing %}
-
-    // <div class="popup active" id="popup-2">
-    //     <div class="overlay" onclick="togglePopup1()">
-
-    //     </div>
-    //     <div class="content-popup">
-    //     <!-- <h4>{{selected_exchange_listing.id}}</h4> -->
-    //     <form method="post">{% csrf_token %}
-
-    //         {% for field in exchange_money_form %}
-                
-    //         <div class="input-box">
-    //             <i>{{field.label}}:</i>
-    //             <br>
-    //             <br>
-    //             {{field}}
-    //         </div>
-        
-    //         {% for error in exchange_money_form.field.errors %}
-    //             <p class="login-error">{{error}}</p>
-    //         {% endfor %}
-    //         {% endfor %}            
-    //     <input type="submit" value="Wymień Pieniądze" name="exchange-money">
-    //     </form>
-    //     <script>
-    //         document.getElementById("id_amount_exchanged").step = Number({{selected_exchange_listing.ratio_to}})
-    //         document.getElementById("id_amount_exchanged").max = Number({{selected_exchange_listing.amount_wanted}}) 
-    //         document.getElementById("id_amount_exchanged").placeholder = "Kwota którą chcesz wymienić w " + "{{selected_exchange_listing.exchange_to}}"
-    //         document.getElementById("id_amount_recived").placeholder = "Kwota którą dostaniesz w " + "{{selected_exchange_listing.exchange_from}}"
-    //     </script>
-
-    //     <script>
-    //         document.getElementById("id_amount_exchanged").oninput = () => {
-    //         document.getElementById("id_amount_recived").value = ((document.getElementById("id_amount_exchanged").value)/{{selected_exchange_listing.ratio_to}}) * {{selected_exchange_listing.ratio_from}}
-    //         }
-    //     </script>
-
-    //     <div class="close-bnt" onclick="togglePopup1()">&times;</div>
-    //     </div>
-    // </div>
-    // {%endif%}
-    // }
 }
-
 
 #[component]
 pub fn DeleteExchangeListingPopUp() -> impl IntoView{
@@ -266,9 +227,9 @@ fn ExchangeListings() -> impl IntoView{
                             view!{ 
                                 <div class="exchange-listing-container">
                                     <h2>Wymień</h2>
-                                    <h3>{exchange_listing.amount_from} {exchange_listing.currency_from_code.clone()} Na {exchange_listing.amount_to} {exchange_listing.currency_to_code.clone()}</h3>
+                                    <h3>{exchange_listing.amount_to} {exchange_listing.currency_to_code.clone()} Na {exchange_listing.amount_from} {exchange_listing.currency_from_code.clone()}</h3>
                                     <h3>"Ratio:"</h3>
-                                    <h4>{exchange_listing.ratio_from} {exchange_listing.currency_from_code} : {exchange_listing.ratio_to} {{exchange_listing.currency_to_code}}</h4>
+                                    <h4>{exchange_listing.ratio_to} {exchange_listing.currency_to_code} : {exchange_listing.ratio_from} {{exchange_listing.currency_from_code}}</h4>
                                     <h4 style="color: gray">"Oferta od: " {exchange_listing.listing_creator_username} </h4>
 
                                     {move ||{

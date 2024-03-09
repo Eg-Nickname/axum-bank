@@ -358,7 +358,7 @@ pub async fn get_exchange_listings(querry_data: ExchangeListingsQueryData) -> Re
 }
 
 #[server(UserExchangeCurrencies, "/api")]
-pub async fn use_exchange_listing(_listing_id: i64) -> Result<(), ServerFnError>{
+pub async fn use_exchange_listing(listing_id: i64) -> Result<(), ServerFnError>{
     match get_user().await {
         Ok(Some(_user)) => {
             leptos_axum::redirect("/currency_exchange");
