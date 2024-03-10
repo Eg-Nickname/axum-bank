@@ -106,6 +106,59 @@ cfg_if! {
             Ok(())
         }
 
+        async fn use_exchange_listing_fn(listing_id: i64, user_id: i64, amount_exchange_to: i64, amount_exchange_from: i64) -> Result<(), ServerFnError>{
+            let pool = pool()?;
+
+            // Begin db transaction to ensure that user balance won't change during transaction creation
+            let mut db_transaction = match pool.begin().await{
+                Err(_) => {
+                    return Err(ServerFnError::ServerError("Cannot begin transaction".to_string()));
+                },
+                Ok(transaction) => transaction
+            };
+
+            // GET LISTING
+            // TODO move to separate function
+            let listing = match sqlx::query_as!(
+                RawExchangeListing,
+                r#"SELECT 
+                id,
+                listing_creator as creator_id, 
+                currency_from_id, 
+                currency_to_id, 
+                amount_from, 
+                amount_to, 
+                ratio_from, 
+                ratio_to 
+        
+                FROM currency_exchange_listings as cel 
+
+                WHERE id = $1
+                "#,
+                listing_id
+            ).fetch_one(&mut *db_transaction)
+            .await{
+                Err(_) =>{
+                    return Err(ServerFnError::ServerError("Can't get listing with provided id {listing_id}".to_string()));
+                },
+                Ok(listing) => listing,
+            };
+
+            // Check if user exists and have enough balance
+            // Check if offer has sufficient ammounts 1. if yes just substract and update it 2. Just trade maximum ammount and delete offer
+            // Add transaction from exchanger to offer creator 
+            // Add transaction from offer creator to exchanger
+
+            // Commit db transaction
+            match db_transaction.commit().await{
+                Err(_) =>{
+                    return Err(ServerFnError::ServerError("Internal error during creating transaction".to_string()));
+                },
+                Ok(_) => (),
+            }
+            Ok(())
+        }
+
         async fn delete_exchange_listing_fn(listing_id: i64, user_id: i64) -> Result<(), ServerFnError>{
             let pool = pool()?;
 
@@ -123,6 +176,7 @@ cfg_if! {
             };
 
             // GET LISTING
+            // TODO move to separate function
             let listing = match sqlx::query_as!(
                 RawExchangeListing,
                 r#"SELECT 
@@ -358,11 +412,11 @@ pub async fn get_exchange_listings(querry_data: ExchangeListingsQueryData) -> Re
 }
 
 #[server(UserExchangeCurrencies, "/api")]
-pub async fn use_exchange_listing(listing_id: i64) -> Result<(), ServerFnError>{
+pub async fn use_exchange_listing(listing_id: i64, amount_exchange_to: i64, amount_exchange_from: i64) -> Result<(), ServerFnError>{
     match get_user().await {
-        Ok(Some(_user)) => {
+        Ok(Some(user)) => {
             leptos_axum::redirect("/currency_exchange");
-            Ok(())
+            use_exchange_listing_fn(listing_id, user.id, amount_exchange_to, amount_exchange_from).await
         },
         _ => {
             Err(ServerFnError::ServerError("Can't get user to exchange_currencies.".to_string()))
