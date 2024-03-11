@@ -9,6 +9,8 @@ cfg_if! {
         use crate::auth::get_user;
         use crate::auth::User;
         use crate::server::utils::*;
+        use crate::server::transactions::{TransactionType, TransactionStatus};
+
 
         fn nwd(x: i64, y: i64) -> i64{
             let mut a = x;
@@ -19,6 +21,34 @@ cfg_if! {
                 else{ b=b-a }
             }
             a
+        }
+
+        async fn get_protected_exchange_listing(db_transcation: &mut sqlx::Transaction<'_, sqlx::Postgres>, listing_id: i64) -> Result<RawExchangeListing, ServerFnError>{
+            match sqlx::query_as!(
+                RawExchangeListing,
+                r#"SELECT 
+                id,
+                listing_creator as creator_id, 
+                currency_from_id, 
+                currency_to_id, 
+                amount_from, 
+                amount_to, 
+                ratio_from, 
+                ratio_to,
+                is_fixed 
+        
+                FROM currency_exchange_listings as cel 
+
+                WHERE id = $1
+                "#,
+                listing_id
+            ).fetch_one(&mut **db_transcation)
+            .await{
+                Err(_) =>{
+                    return Err(ServerFnError::ServerError("Can't get listing with provided id {listing_id}".to_string()));
+                },
+                Ok(listing) => return Ok(listing),
+            }
         }
 
         // TODO properly log error on server side
@@ -106,7 +136,7 @@ cfg_if! {
             Ok(())
         }
 
-        async fn use_exchange_listing_fn(listing_id: i64, user_id: i64, amount_exchange_to: i64, amount_exchange_from: i64) -> Result<(), ServerFnError>{
+        async fn use_exchange_listing_fn(listing_id: i64, exchanger_id: i64, amount_exchange_to: i64, amount_exchange_from: i64) -> Result<(), ServerFnError>{
             let pool = pool()?;
 
             // Begin db transaction to ensure that user balance won't change during transaction creation
@@ -119,35 +149,116 @@ cfg_if! {
 
             // GET LISTING
             // TODO move to separate function
-            let listing = match sqlx::query_as!(
-                RawExchangeListing,
-                r#"SELECT 
-                id,
-                listing_creator as creator_id, 
-                currency_from_id, 
-                currency_to_id, 
-                amount_from, 
-                amount_to, 
-                ratio_from, 
-                ratio_to 
-        
-                FROM currency_exchange_listings as cel 
+            let listing = get_protected_exchange_listing(&mut db_transaction, listing_id).await?;
 
-                WHERE id = $1
-                "#,
-                listing_id
-            ).fetch_one(&mut *db_transaction)
+            // Check if ammounts from and to are correct
+            if amount_exchange_to%listing.ratio_to != 0 || amount_exchange_from%listing.ratio_from != 0 || amount_exchange_to/listing.ratio_to != amount_exchange_from/listing.ratio_from{
+                return Err(ServerFnError::ServerError("Amount to/from parameters not correct.".to_string()));
+            }
+
+            // Check if exchanging user have enough balance
+            let exchanger_balance = get_balance(&mut db_transaction, exchanger_id, listing.currency_to_id).await?;
+            if exchanger_balance.balance - amount_exchange_to <0{
+                return Err(ServerFnError::ServerError("User has not enough balance to exchange".to_string()));
+            }
+
+            // Check if offer has sufficient ammounts 1. if yes just substract and update it 2. Just trade maximum ammount and delete offer
+            if listing.is_fixed{
+                // Do nothing
+            }else if listing.amount_to - amount_exchange_to > 0 {
+                // Update exchange offer ammounts to exchange
+                match query!(
+                    "UPDATE currency_exchange_listings SET amount_to = amount_to - $1, amount_from = amount_from - $2 WHERE id=$3",
+                    amount_exchange_to,
+                    amount_exchange_from,
+                    listing.id,
+                ).execute(&mut *db_transaction)
+                .await{
+                    Err(_) =>{
+                        return Err(ServerFnError::ServerError("Internal error during updating listing".to_string()));
+                    },
+                    Ok(_) => (),
+                }
+            }else{
+                // Delete exchange offer due to fullfilment
+                match query!(
+                    "DELETE FROM currency_exchange_listings WHERE id=$1",
+                    listing.id,
+                ).execute(&mut *db_transaction)
+                .await{
+                    Err(_) =>{
+                        return Err(ServerFnError::ServerError("Internal error during deleting listing".to_string()));
+                    },
+                    Ok(_) => (),
+                }
+            }
+            // Selects amount provided by user or maximum amount of that offer if it is less
+            let exchanged_amount_to = amount_exchange_to.min(listing.amount_to);
+            let exchanged_amount_from = amount_exchange_from.min(listing.amount_from);
+
+            // Uptade exchanger balance
+            // Updates user balance in currency send
+            match query!(
+                "UPDATE account_balance SET balance = balance - $1 WHERE user_id=$2 AND currency_id=$3",
+                exchanged_amount_to,
+                exchanger_id,
+                listing.currency_to_id
+            ).execute(&mut *db_transaction)
             .await{
                 Err(_) =>{
-                    return Err(ServerFnError::ServerError("Can't get listing with provided id {listing_id}".to_string()));
+                    return Err(ServerFnError::ServerError("Internal error during updating listing".to_string()));
                 },
-                Ok(listing) => listing,
-            };
+                Ok(_) => (),
+            }
+            // Updates user balance in currency recived
+            match query!(
+                "UPDATE account_balance SET balance = balance + $1 WHERE user_id=$2 AND currency_id=$3",
+                exchanged_amount_from,
+                exchanger_id,
+                listing.currency_from_id
+            ).execute(&mut *db_transaction)
+            .await{
+                Err(_) =>{
+                    return Err(ServerFnError::ServerError("Internal error during updating listing".to_string()));
+                },
+                Ok(_) => (),
+            }
 
-            // Check if user exists and have enough balance
-            // Check if offer has sufficient ammounts 1. if yes just substract and update it 2. Just trade maximum ammount and delete offer
             // Add transaction from exchanger to offer creator 
+            match query!(
+                "INSERT INTO transactions(sender_id, reciver_id, currency_id, ammount, status, type, title) VALUES ($1, $2, $3, $4, $5, $6, $7);",
+                exchanger_id,
+                listing.creator_id,
+                listing.currency_to_id,
+                exchanged_amount_to,
+                TransactionStatus::Sent as TransactionStatus,
+                TransactionType::CurrencyExchange as TransactionType,
+                "Wymiana"
+            ).execute(&mut *db_transaction)
+            .await{
+                Err(_) =>{
+                    return Err(ServerFnError::ServerError("Internal error during inserting exchange transaction.".to_string()));
+                },
+                Ok(_) => (),
+            }
+
             // Add transaction from offer creator to exchanger
+            match query!(
+                "INSERT INTO transactions(sender_id, reciver_id, currency_id, ammount, status, type, title) VALUES ($1, $2, $3, $4, $5, $6, $7);",
+                listing.creator_id,
+                exchanger_id,
+                listing.currency_from_id,
+                exchanged_amount_from,
+                TransactionStatus::Sent as TransactionStatus,
+                TransactionType::CurrencyExchange as TransactionType,
+                "Wymiana"
+            ).execute(&mut *db_transaction)
+            .await{
+                Err(_) =>{
+                    return Err(ServerFnError::ServerError("Internal error during inserting exchange transaction.".to_string()));
+                },
+                Ok(_) => (),
+            }
 
             // Commit db transaction
             match db_transaction.commit().await{
@@ -176,31 +287,7 @@ cfg_if! {
             };
 
             // GET LISTING
-            // TODO move to separate function
-            let listing = match sqlx::query_as!(
-                RawExchangeListing,
-                r#"SELECT 
-                id,
-                listing_creator as creator_id, 
-                currency_from_id, 
-                currency_to_id, 
-                amount_from, 
-                amount_to, 
-                ratio_from, 
-                ratio_to 
-        
-                FROM currency_exchange_listings as cel 
-
-                WHERE id = $1
-                "#,
-                listing_id
-            ).fetch_one(&mut *db_transaction)
-            .await{
-                Err(_) =>{
-                    return Err(ServerFnError::ServerError("Can't get listing with provided id {listing_id}".to_string()));
-                },
-                Ok(listing) => listing,
-            };
+            let listing = get_protected_exchange_listing(&mut db_transaction, listing_id).await?;
 
             // Check if logged user is creator of the listing+
             if Some(user.id) != listing.creator_id{
@@ -300,6 +387,7 @@ pub struct RawExchangeListing {
     pub amount_to: i64,
     pub ratio_from: i64,
     pub ratio_to: i64,
+    pub is_fixed: bool,
 }
 
 #[server(DeleteExchangeListing, "/api")]
