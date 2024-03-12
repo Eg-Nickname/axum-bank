@@ -18,6 +18,3 @@ playwright/.cache/
 
 # env variables
 .env
-
-# IMAGES
-public/*
