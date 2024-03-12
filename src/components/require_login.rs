@@ -18,7 +18,7 @@ pub fn require_login_with_redirect(children: ChildrenFn) -> impl IntoView{
                     //     Some(route) =>{ view!{ <Redirect path={route} /> }.into_view()},
                     //     None => { view!{ <Redirect path="/" /> }.into_view()},
                     // }
-                    view!{ <Redirect path="/login/" /> }.into_view()}
+                    view!{ <Redirect path="/login" /> }.into_view()}
                 
             });
         }}

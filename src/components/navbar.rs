@@ -23,9 +23,9 @@ pub fn NavBar() -> impl IntoView {
                 <ul class="flexBlock" id="top-ul">
                     <li class="logo"><A href="/"><img src="/images/logo_bank.png" alt="My image"/></A></li>
                     <li class="li-nav"><A class="link" href="/">"Strona główna"</A></li>
-                    <li class="li-nav"><A class="link" href="/transactions/">"Saldo"</A></li>
-                    <li class="li-nav"><A class="link" href="/currency_exchange/">"Wymiana walut"</A></li>
-                    <li class="li-nav"><A class="link" href="/transaction_orders/">"Zlecenia transakcji"</A></li>
+                    <li class="li-nav"><A class="link" href="/transactions">"Saldo"</A></li>
+                    <li class="li-nav"><A class="link" href="/currency_exchange">"Wymiana walut"</A></li>
+                    <li class="li-nav"><A class="link" href="/transaction_orders">"Zlecenia transakcji"</A></li>
                 </ul>
 
                 <ul class="flexBlock logowanie" id="bottom-ul">
@@ -46,8 +46,8 @@ pub fn NavBar() -> impl IntoView {
                                 
                                 // Render this if user is not logged in
                                 Ok(None) => view!{
-                                    <li class="login"><A class="transparent-purple-button" href="/login/">"Zaloguj się"</A></li>
-                                    <li class="login"><A class="transparent-purple-button" href="/signup/">"Zarejestruj się"</A></li>
+                                    <li class="login"><A class="transparent-purple-button" href="/login">"Zaloguj się"</A></li>
+                                    <li class="login"><A class="transparent-purple-button" href="/signup">"Zarejestruj się"</A></li>
                                 }.into_view(),
 
                                 // Else render nothing

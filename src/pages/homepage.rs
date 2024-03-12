@@ -27,12 +27,12 @@ pub fn HomePage() -> impl IntoView {
                             user.get().map(|user| match user {
                                 // Logged in user
                                 Ok(Some(_user)) => view! {
-                                    <A class="transparent-purple-button" href="/transactions/">"Dziękujemy za zaufanie!"<i class="fas fa-arrow-right"></i></A>
+                                    <A class="transparent-purple-button" href="/transactions">"Dziękujemy za zaufanie!"<i class="fas fa-arrow-right"></i></A>
                                 }.into_view(),
 
                                 // Not logged in user
                                 Ok(None) => view! {
-                                    <A class="transparent-purple-button" href="/signup/">"Dołacz do nas!"<i class="fas fa-arrow-right"></i></A>
+                                    <A class="transparent-purple-button" href="/signup">"Dołacz do nas!"<i class="fas fa-arrow-right"></i></A>
                                 }.into_view(),
 
                                 // Else

@@ -39,7 +39,7 @@ pub fn LoginPage(
                 <p style="margin-bottom: 30px;">
                     "Zarejestruj się już teraz klikając poniższy przycisk. Odniesiesz wiele korzyści zaczynając od możliwości sprawdzaenia swojego salda, až po dostęp do wymiany swoich pieniędzy na inne waluty czy trade'owanie się z innymi użytkownikami!"
                 </p>
-                <A  class="transparent-purple-button" href="/signup/">"Zarejestruj sie"</A>  
+                <A  class="transparent-purple-button" href="/signup">"Zarejestruj sie"</A>  
             </div>
     }
 }

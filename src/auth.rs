@@ -1,5 +1,5 @@
 use cfg_if::cfg_if;
-use leptos::{logging::warn, *};
+use leptos::*;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
@@ -170,10 +170,9 @@ pub async fn login(
     let user: User = User::get_from_username(username.clone(), &pool)
         .await
         .ok_or_else(|| {
-            warn!("User does not exist");
-            ServerFnError::ServerError("User does not exist.".into())
+            ServerFnError::new("User does not exist.")
         })?;
-        warn!("user logged in {}", username);
+        // warn!("user logged in {}", username);
     match verify(password, &user.password)? {
         true => {
             auth.login_user(user.id);
@@ -222,8 +221,8 @@ pub async fn signup(
         User::get_from_username(username, &pool)
             .await
             .ok_or_else(|| {
-                ServerFnError::ServerError(
-                    "Signup failed: User does not exist.".into(),
+                ServerFnError::new(
+                    "Signup failed: User does not exist.",
                 )
             })?;
 

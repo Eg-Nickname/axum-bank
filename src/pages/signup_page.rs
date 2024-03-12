@@ -43,7 +43,7 @@ pub fn SignupPage(
             <p style="margin-bottom: 30px;">
                 "Zaloguj się klikając w link poniżej i ciesz się możliwościami!"
             </p>
-            <A  class="transparent-purple-button" href="/login/">"Zaloguj sie"</A>  
+            <A  class="transparent-purple-button" href="/login">"Zaloguj sie"</A>  
         </div>
     }
 }

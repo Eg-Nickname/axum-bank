@@ -5,8 +5,8 @@ if #[cfg(feature = "ssr")] {
     use axum::{
         response::{Response, IntoResponse},
         routing::get,
-        extract::{Path, State, RawQuery},
-        http::{Request, header::HeaderMap},
+        extract::{Path, State},
+        http::Request,
         body::Body as AxumBody,
         Router,
     };
@@ -24,9 +24,9 @@ if #[cfg(feature = "ssr")] {
     use axum_bank_narody::state::AppState;
     use axum_bank_narody::auth::*;
 
-    async fn server_fn_handler(State(app_state): State<AppState>, auth_session: AuthSession<User, i64, SessionPgPool, PgPool>, path: Path<String>, headers: HeaderMap, raw_query: RawQuery,
-    request: Request<AxumBody>) -> impl IntoResponse {
-        handle_server_fns_with_context(path, headers, raw_query, move || {
+    async fn server_fn_handler(State(app_state): State<AppState>, auth_session: AuthSession<User, i64, SessionPgPool, PgPool>, path: Path<String>, request: Request<AxumBody>) -> impl IntoResponse {
+        let _ = path;
+        handle_server_fns_with_context(move || {
             provide_context(auth_session.clone());
             provide_context(app_state.pool.clone());
         }, request).await
@@ -91,10 +91,8 @@ if #[cfg(feature = "ssr")] {
 
         
         // log!("listening on http://{}", &addr);
-        axum::Server::bind(&addr)
-            .serve(app.into_make_service())
-            .await
-            .unwrap();
+        let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
+        axum::serve(listener, app.into_make_service()).await.unwrap();
     }
 }}
 
