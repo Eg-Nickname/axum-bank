@@ -146,10 +146,10 @@ if #[cfg(feature = "ssr")] {
 }
 }
 
-#[server(Foo, "/api")]
-pub async fn foo() -> Result<String, ServerFnError> {
-    Ok(String::from("Bar!"))
-}
+// #[server(Foo, "/api")]
+// pub async fn foo() -> Result<String, ServerFnError> {
+//     Ok(String::from("Bar!"))
+// }
 
 #[server(GetUser, "/api")]
 pub async fn get_user() -> Result<Option<User>, ServerFnError> {

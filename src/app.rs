@@ -58,8 +58,7 @@ pub fn App() -> impl IntoView {
         }>
             <NavBar />
             <Routes>
-                    <Route path="" view=|| view! {"test of router"<HomePage/> }/>
-                    <Route path="podstrona" view=|| view! {"test of router" }/>
+                    <Route path="" view=|| view! {<HomePage/> }/>
 
                     <Route path="/transactions/" view=|| view! { 
                         <RequireLoginWithRedirect>
@@ -86,7 +85,6 @@ pub fn App() -> impl IntoView {
 
 
                     <Route path="signup/" view=move || view! {
-                        "registeration"
                         <SignupPage action=signup/>
                     }/>
                     <Route path="login/" view=move || view! {
