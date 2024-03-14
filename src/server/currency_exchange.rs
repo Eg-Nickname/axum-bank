@@ -223,6 +223,22 @@ cfg_if! {
                 },
                 Ok(_) => (),
             }
+            
+            // Updates offer creator balance if exists
+            if let Some(creator_id) = listing.creator_id{
+                match query!(
+                    "UPDATE account_balance SET balance = balance + $1 WHERE user_id=$2 AND currency_id=$3",
+                    exchanged_amount_to,
+                    creator_id,
+                    listing.currency_to_id
+                ).execute(&mut *db_transaction)
+                .await{
+                    Err(_) =>{
+                        return Err(ServerFnError::ServerError("Internal error during updating listing".to_string()));
+                    },
+                    Ok(_) => (),
+                }
+            }
 
             // Add transaction from exchanger to offer creator 
             match query!(

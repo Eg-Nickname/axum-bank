@@ -59,7 +59,6 @@ pub fn App() -> impl IntoView {
             <NavBar />
             <Routes>
                     <Route path="" view=|| view! {<HomePage/> }/>
-                    <Route path="podstrona" view=|| view! {"test of router" }/>
 
                     <Route path="/transactions/" view=|| view! { 
                         <RequireLoginWithRedirect>
