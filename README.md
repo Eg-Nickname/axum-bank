@@ -1,86 +1,56 @@
-<picture>
-    <source srcset="https://raw.githubusercontent.com/leptos-rs/leptos/main/docs/logos/Leptos_logo_Solid_White.svg" media="(prefers-color-scheme: dark)">
-    <img src="https://raw.githubusercontent.com/leptos-rs/leptos/main/docs/logos/Leptos_logo_RGB.svg" alt="Leptos Logo">
-</picture>
-
-# Leptos Axum Starter Template
-
-This is a template for use with the [Leptos](https://github.com/leptos-rs/leptos) web framework and the [cargo-leptos](https://github.com/akesson/cargo-leptos) tool using [Axum](https://github.com/tokio-rs/axum).
-
-## Creating your template repo
-
-If you don't have `cargo-leptos` installed you can install it with
-
+## Jak uruchomić
+Aby uruchomić aplikację należy posiadać wersję `1.76.0-nightly` (wersja z funkcjami, które nie są ustabilizowane w normalnej wersji) języka Rust lub nowszą. By uzyskać wersję nighly należy wykonać polecenia:
 ```bash
-cargo install cargo-leptos
+rustup toolchain install nightly
+rustup default nightly
 ```
-
-Then run
+Należy również dodać architekturę kompilacji (architektura wasm pozwala na uruchamianie kodu min. przez przeglądarki):
 ```bash
-cargo leptos new --git leptos-rs/start-axum
+rustup target add wasm32-unknown-unknown
 ```
-
-to generate a new project template.
-
+Do wykonywania migracji na bazie danych będzie potrzebne dodatkowe narzędzie biblioteki `sqlx` o nazwie `sqlx-cli` w wersji `0.7.1`, które możemy pobrać używając komendy (`cargo` jest menadżerem bibliotek oraz aplikacji terminalowych języka Rust)
 ```bash
-cd {projectname}
+cargo install sqlx-cli
+```
+By skompilować stronę oraz udostępnić ją w internecię będzie potrzebne narzędzie `cargo-lepts` w wersji `2.16.0`, które zainstalujemy komendą:
+```
+cargo install cargo-leptos --version "2.16.0"
+``` 
+Po zainstalowaniu wymaganych aplikacji należy pobrać kod z platformy github:
+```
+git clone https://github.com/Eg-Nickname/axum-bank.git
+```
+A następnie utworzyć plik `.env` zawierający dane do połączenia się aplikacji z bazą danych:
+```env
+DATABASE_URL="postgres://user:password@localhost/axum_bank"
+```
+By skompilować i udostępnić stronę należy wykonać polecenie:
+```
+cargo leptos serve
 ```
 
-to go to your newly created project.  
-Feel free to explore the project structure, but the best place to start with your application code is in `src/app.rs`.  
-Addtionally, Cargo.toml may need updating as new versions of the dependencies are released, especially if things are not working after a `cargo update`.
-
-## Running your project
-
+## How to run
+To run code you need:
+- Rust version `1.76.0-nightly` or newer and wasm compilation target
 ```bash
-cargo leptos watch
+rustup toolchain install nightly
+rustup default nightly
+rustup target add wasm32-unknown-unknown
 ```
-
-## Installing Additional Tools
-
-By default, `cargo-leptos` uses `nightly` Rust, `cargo-generate`, and `sass`. If you run into any trouble, you may need to install one or more of these tools.
-
-1. `rustup toolchain install nightly --allow-downgrade` - make sure you have Rust nightly
-2. `rustup target add wasm32-unknown-unknown` - add the ability to compile Rust to WebAssembly
-3. `cargo install cargo-generate` - install `cargo-generate` binary (should be installed automatically in future)
-4. `npm install -g sass` - install `dart-sass` (should be optional in future
-
-## Compiling for Release
+- sql-cli version `0.7.1`
 ```bash
-cargo leptos build --release
+cargo install sqlx-cli
 ```
-
-Will generate your server binary in target/server/release and your site package in target/site
-
-## Testing Your Project
+- cargo-leptos version `2.16.0`
 ```bash
-cargo leptos end-to-end
+cargo install cargo-leptos --version "2.16.0"
+```
+- .env file containing database credentials 
+```env
+DATABASE_URL="postgres://user:password@localhost/axum_bank"
 ```
 
+To run application use command:
 ```bash
-cargo leptos end-to-end --release
+cargo leptos serve
 ```
-
-Cargo-leptos uses Playwright as the end-to-end test tool.  
-Tests are located in end2end/tests directory.
-
-## Executing a Server on a Remote Machine Without the Toolchain
-After running a `cargo leptos build --release` the minimum files needed are:
-
-1. The server binary located in `target/server/release`
-2. The `site` directory and all files within located in `target/site`
-
-Copy these files to your remote server. The directory structure should be:
-```text
-start-axum
-site/
-```
-Set the following environment variables (updating for your project as needed):
-```text
-LEPTOS_OUTPUT_NAME="start-axum"
-LEPTOS_SITE_ROOT="site"
-LEPTOS_SITE_PKG_DIR="pkg"
-LEPTOS_SITE_ADDR="127.0.0.1:3000"
-LEPTOS_RELOAD_PORT="3001"
-```
-Finally, run the server binary.
