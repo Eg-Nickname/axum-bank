@@ -17,8 +17,8 @@ cfg_if! {
             let mut b = y;
 
             while a != b{
-                if a>b{ a=a-b }
-                else{ b=b-a }
+                if a>b{ a-=b }
+                else{ b-=a }
             }
             a
         }
@@ -45,9 +45,9 @@ cfg_if! {
             ).fetch_one(&mut **db_transcation)
             .await{
                 Err(_) =>{
-                    return Err(ServerFnError::ServerError("Can't get listing with provided id {listing_id}".to_string()));
+                    Err(ServerFnError::ServerError("Can't get listing with provided id {listing_id}".to_string()))
                 },
-                Ok(listing) => return Ok(listing),
+                    Ok(listing) => Ok(listing),
             }
         }
 
@@ -91,24 +91,22 @@ cfg_if! {
                 return Err(ServerFnError::ServerError("Not enough balance to create exchange listing.".to_string()));
             }
             // Update sender balance
-            match query!(
+            if query!(
                 "UPDATE account_balance SET balance = balance - $1 WHERE user_id = $2 AND currency_id = $3;",
                 amount_from,
                 listing_creator.id,
                 currency_from_id
             ).execute(&mut *db_transaction)
-            .await{
-                Err(_) =>{
-                    return Err(ServerFnError::ServerError("Internal error during creating exchange listing".to_string()));
-                },
-                Ok(_) => (),
+            .await.is_err(){
+                return Err(ServerFnError::ServerError("Internal error during creating exchange listing".to_string()));
             }
+
             let nwd = nwd(amount_from, amount_to);
             let ratio_from = amount_from/nwd;
             let ratio_to = amount_to/nwd;
 
             // Create new exchange listing record
-            match query!(
+            if query!(
                 "INSERT INTO currency_exchange_listings(listing_creator, currency_from_id, amount_from, currency_to_id, amount_to, ratio_from, ratio_to, is_fixed) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);",
                 listing_creator.id,
                 currency_from_id,
@@ -119,19 +117,13 @@ cfg_if! {
                 ratio_to,
                 is_fixed
             ).execute(&mut *db_transaction)
-            .await{
-                Err(_) =>{
-                    return Err(ServerFnError::ServerError("Internal error during creating transaction".to_string()));
-                },
-                Ok(_) => (),
+            .await.is_err(){
+                return Err(ServerFnError::ServerError("Internal error during creating transaction".to_string()));
             }
 
             // Commit db transaction
-            match db_transaction.commit().await{
-                Err(_) =>{
-                    return Err(ServerFnError::ServerError("Internal error during creating transaction".to_string()));
-                },
-                Ok(_) => (),
+            if db_transaction.commit().await.is_err(){
+                return Err(ServerFnError::ServerError("Internal error during creating transaction".to_string()));
             }
             Ok(())
         }
@@ -167,29 +159,24 @@ cfg_if! {
                 // Do nothing
             }else if listing.amount_to - amount_exchange_to > 0 {
                 // Update exchange offer ammounts to exchange
-                match query!(
+                if query!(
                     "UPDATE currency_exchange_listings SET amount_to = amount_to - $1, amount_from = amount_from - $2 WHERE id=$3",
                     amount_exchange_to,
                     amount_exchange_from,
                     listing.id,
                 ).execute(&mut *db_transaction)
-                .await{
-                    Err(_) =>{
-                        return Err(ServerFnError::ServerError("Internal error during updating listing".to_string()));
-                    },
-                    Ok(_) => (),
+                .await.is_err(){
+                    return Err(ServerFnError::ServerError("Internal error during updating listing".to_string()));
                 }
+
             }else{
                 // Delete exchange offer due to fullfilment
-                match query!(
+                if query!(
                     "DELETE FROM currency_exchange_listings WHERE id=$1",
                     listing.id,
                 ).execute(&mut *db_transaction)
-                .await{
-                    Err(_) =>{
-                        return Err(ServerFnError::ServerError("Internal error during deleting listing".to_string()));
-                    },
-                    Ok(_) => (),
+                .await.is_err(){
+                    return Err(ServerFnError::ServerError("Internal error during deleting listing".to_string()));
                 }
             }
             // Selects amount provided by user or maximum amount of that offer if it is less
@@ -198,50 +185,41 @@ cfg_if! {
 
             // Uptade exchanger balance
             // Updates user balance in currency send
-            match query!(
+            if query!(
                 "UPDATE account_balance SET balance = balance - $1 WHERE user_id=$2 AND currency_id=$3",
                 exchanged_amount_to,
                 exchanger_id,
                 listing.currency_to_id
             ).execute(&mut *db_transaction)
-            .await{
-                Err(_) =>{
-                    return Err(ServerFnError::ServerError("Internal error during updating listing".to_string()));
-                },
-                Ok(_) => (),
+            .await.is_err(){
+                return Err(ServerFnError::ServerError("Internal error during updating listing".to_string()));
             }
             // Updates user balance in currency recived
-            match query!(
+            if query!(
                 "UPDATE account_balance SET balance = balance + $1 WHERE user_id=$2 AND currency_id=$3",
                 exchanged_amount_from,
                 exchanger_id,
                 listing.currency_from_id
             ).execute(&mut *db_transaction)
-            .await{
-                Err(_) =>{
-                    return Err(ServerFnError::ServerError("Internal error during updating listing".to_string()));
-                },
-                Ok(_) => (),
+            .await.is_err(){
+                return Err(ServerFnError::ServerError("Internal error during updating listing".to_string()));
             }
 
             // Updates offer creator balance if exists
             if let Some(creator_id) = listing.creator_id{
-                match query!(
+                if query!(
                     "UPDATE account_balance SET balance = balance + $1 WHERE user_id=$2 AND currency_id=$3",
                     exchanged_amount_to,
                     creator_id,
                     listing.currency_to_id
                 ).execute(&mut *db_transaction)
-                .await{
-                    Err(_) =>{
-                        return Err(ServerFnError::ServerError("Internal error during updating listing".to_string()));
-                    },
-                    Ok(_) => (),
+                .await.is_err(){
+                    return Err(ServerFnError::ServerError("Internal error during updating listing".to_string()));
                 }
             }
 
             // Add transaction from exchanger to offer creator
-            match query!(
+            if query!(
                 "INSERT INTO transactions(sender_id, reciver_id, currency_id, ammount, status, type, title) VALUES ($1, $2, $3, $4, $5, $6, $7);",
                 exchanger_id,
                 listing.creator_id,
@@ -251,15 +229,12 @@ cfg_if! {
                 TransactionType::CurrencyExchange as TransactionType,
                 "Wymiana"
             ).execute(&mut *db_transaction)
-            .await{
-                Err(_) =>{
-                    return Err(ServerFnError::ServerError("Internal error during inserting exchange transaction.".to_string()));
-                },
-                Ok(_) => (),
+            .await.is_err(){
+                return Err(ServerFnError::ServerError("Internal error during inserting exchange transaction.".to_string()));
             }
 
             // Add transaction from offer creator to exchanger
-            match query!(
+            if query!(
                 "INSERT INTO transactions(sender_id, reciver_id, currency_id, ammount, status, type, title) VALUES ($1, $2, $3, $4, $5, $6, $7);",
                 listing.creator_id,
                 exchanger_id,
@@ -269,19 +244,13 @@ cfg_if! {
                 TransactionType::CurrencyExchange as TransactionType,
                 "Wymiana"
             ).execute(&mut *db_transaction)
-            .await{
-                Err(_) =>{
-                    return Err(ServerFnError::ServerError("Internal error during inserting exchange transaction.".to_string()));
-                },
-                Ok(_) => (),
+            .await.is_err(){
+                return Err(ServerFnError::ServerError("Internal error during inserting exchange transaction.".to_string()));
             }
 
             // Commit db transaction
-            match db_transaction.commit().await{
-                Err(_) =>{
-                    return Err(ServerFnError::ServerError("Internal error during creating transaction".to_string()));
-                },
-                Ok(_) => (),
+            if db_transaction.commit().await.is_err(){
+                return Err(ServerFnError::ServerError("Internal error during creating transaction".to_string()));
             }
             Ok(())
         }
@@ -310,37 +279,28 @@ cfg_if! {
                 return Err(ServerFnError::ServerError("User: {user.username} is not the creator of the listing.".to_string()));
             }
 
-            match query!(
+            if query!(
                 "UPDATE account_balance SET balance = balance + $1 WHERE user_id = $2 AND currency_id = $3;",
                 listing.amount_from,
                 user.id,
                 listing.currency_from_id,
             ).execute(&mut *db_transaction)
-            .await{
-                Err(_) =>{
-                    return Err(ServerFnError::ServerError("Internal error during updating user balance".to_string()));
-                },
-                Ok(_) => (),
+            .await.is_err(){
+                return Err(ServerFnError::ServerError("Internal error during updating user balance".to_string()));
             }
 
-            match query!(
+            if query!(
                 "DELETE FROM currency_exchange_listings WHERE id=$1 AND listing_creator=$2",
                 listing.id,
                 user.id,
             ).execute(&mut *db_transaction)
-            .await{
-                Err(_) =>{
+            .await.is_err(){
                     return Err(ServerFnError::ServerError("Internal error during deleting listing".to_string()));
-                },
-                Ok(_) => (),
             }
 
             // Commit db transaction
-            match db_transaction.commit().await{
-                Err(_) =>{
-                    return Err(ServerFnError::ServerError("Internal error during creating transaction".to_string()));
-                },
-                Ok(_) => (),
+            if db_transaction.commit().await.is_err(){
+                return Err(ServerFnError::ServerError("Internal error during creating transaction".to_string()));
             }
 
             Ok(())

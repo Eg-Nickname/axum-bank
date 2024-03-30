@@ -43,10 +43,8 @@ pub fn require_login(children: ChildrenFn) -> impl IntoView {
             fallback=move || view! {<span>"Loading..."</span>}
         >
         {move ||{
-            user.get().map(|user| match user {
-                Ok(Some(_user)) => set_show_children(true),
-                _ => ()
-        })}}
+            user.get().map(|user| if let Ok(Some(_)) = user {set_show_children(true)}
+        )}}
 
         {if show_children(){
             view!{""{children()}}.into_view()

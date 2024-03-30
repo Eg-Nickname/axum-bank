@@ -48,7 +48,7 @@ pub fn InspectExchangeListingPopUp() -> impl IntoView {
                                 </div>
                             }
                         }.into_view(),
-                        _ => {}.into_view(),
+                        _ => view!{}.into_view(),
                     }
                 }
                 }

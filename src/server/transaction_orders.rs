@@ -12,16 +12,13 @@ cfg_if! {
 
         async fn delete_transaction_order_fn(trans_order_id: i64, user_id: i64)-> Result<(), ServerFnError>{
             let pool = pool()?;
-            match query!(
+            if query!(
                 "DELETE FROM transaction_orders WHERE id=$1 AND sender_id=$2",
                 trans_order_id,
                 user_id,
             ).execute(&pool)
-            .await{
-                Err(_) =>{
-                    return Err(ServerFnError::ServerError("Internal error during deleting listing".to_string()));
-                },
-                Ok(_) => (),
+            .await.is_err(){
+                return Err(ServerFnError::ServerError("Internal error during deleting listing".to_string()));
             };
             Ok(())
         }
@@ -49,7 +46,7 @@ cfg_if! {
             }
 
             // Create transaction order
-            match query!(
+            if query!(
                 "INSERT INTO transaction_orders(sender_id, reciver_id, amount, currency_id, last_transaction, transaction_delay, title) VALUES ($1, $2, $3, $4, '2000-01-11 11:11', $5, $6);",
                 sender_id,
                 reciver_id,
@@ -58,11 +55,8 @@ cfg_if! {
                 delay_days as i32,
                 title
             ).execute(&pool)
-            .await{
-                Err(_) =>{
-                    return Err(ServerFnError::ServerError("Internal error during creating transaction order".to_string()));
-                },
-                Ok(_) => (),
+            .await.is_err(){
+                return Err(ServerFnError::ServerError("Internal error during creating transaction order".to_string()));
             }
             Ok(())
         }

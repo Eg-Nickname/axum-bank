@@ -15,7 +15,7 @@ pub fn PageButtons(
     page_url: String,
 ) -> impl IntoView {
     let query = use_query_map();
-    let query_str = move || query().to_query_string().replace("#", "%23");
+    let query_str = move || query().to_query_string().replace('#', "%23");
 
     let params = use_params_map();
     let page = move || params().get("page").cloned();

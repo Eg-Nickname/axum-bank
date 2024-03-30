@@ -74,10 +74,9 @@ cfg_if! {
         };
         // Check if currency with currency_code exists
         let currency_id = match sqlx::query_as!(CurrencyId, "SELECT id FROM currencies WHERE code= $1", currency_code).fetch_one(&pool).await {
-            Err(_) => { return Err(ServerFnError::ServerError("Currency: {currency_code} does not exist.".to_string())) },
+            Err(_) => { return Err(ServerFnError::ServerError("Currency: {currency_code} does not exist.".to_string()))},
             Ok(currency) => currency.id
         };
-
 
         // Begin db transaction to ensure that user balances won't change during transaction creation
         let mut db_transaction = match pool.begin().await{
@@ -95,35 +94,29 @@ cfg_if! {
             return Err(ServerFnError::ServerError("Not enough balance to create transaction.".to_string()));
         }
         // Update sender balance
-        match query!(
+        if query!(
             "UPDATE account_balance SET balance = balance - $1 WHERE user_id = $2 AND currency_id = $3;",
             amount,
             sender.id,
             currency_id
         ).execute(&mut *db_transaction)
-        .await{
-            Err(_) =>{
+        .await.is_err(){
                 return Err(ServerFnError::ServerError("Internal error during creating transaction".to_string()));
-            },
-            Ok(_) => (),
         }
 
         // Update reciver balance
-        match query!(
+        if query!(
             "UPDATE account_balance SET balance = balance + $1 WHERE user_id = $2 AND currency_id = $3;",
             amount,
             reciver.id,
             currency_id
         ).execute(&mut *db_transaction)
-        .await{
-            Err(_) =>{
-                return Err(ServerFnError::ServerError("Internal error during creating transaction".to_string()));
-            },
-            Ok(_) => (),
+        .await.is_err(){
+            return Err(ServerFnError::ServerError("Internal error during creating transaction".to_string()));
         }
 
         // Create transaction record
-        match query!(
+        if query!(
             "INSERT INTO transactions(sender_id, reciver_id, currency_id, ammount, status, type, title) VALUES ($1, $2, $3, $4, $5, $6, $7);",
             sender.id,
             reciver.id,
@@ -133,19 +126,13 @@ cfg_if! {
             transcation_type as TransactionType,
             title
         ).execute(&mut *db_transaction)
-        .await{
-            Err(_) =>{
-                return Err(ServerFnError::ServerError("Internal error during creating transaction".to_string()));
-            },
-            Ok(_) => (),
+        .await.is_err(){
+            return Err(ServerFnError::ServerError("Internal error during creating transaction".to_string()));
         }
 
         // Commit db transaction
-        match db_transaction.commit().await{
-            Err(_) =>{
+        if db_transaction.commit().await.is_err(){
                 return Err(ServerFnError::ServerError("Internal error during creating transaction".to_string()));
-            },
-            Ok(_) => (),
         }
         Ok(())
     }
