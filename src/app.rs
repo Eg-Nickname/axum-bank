@@ -6,6 +6,7 @@ use crate::pages::homepage::HomePage;
 use crate::pages::login_page::LoginPage;
 use crate::pages::signup_page::SignupPage;
 use crate::server::currency_exchange::CreateExchangeListing;
+use crate::server::transaction_orders::NewUserTransactionOrder;
 use crate::server::transactions::{NewUserTransaction, WithdrawOrder};
 
 use leptos::*;
@@ -37,6 +38,7 @@ pub fn App() -> impl IntoView {
     let withdraw_order_action = create_server_action::<WithdrawOrder>();
 
     let new_exchange_order_action = create_server_action::<CreateExchangeListing>();
+    let new_transaction_order_action = create_server_action::<NewUserTransactionOrder>();
 
     // Resources
     let user: Resource<(usize, usize, usize), Result<Option<User>, ServerFnError>> =
@@ -93,7 +95,7 @@ pub fn App() -> impl IntoView {
                         </RequireLoginWithRedirect>
                     }>
                         <Route path="/" view=|| view! {} />
-                        <Route path="new_transaction_order/" view=move || view! { <NewTransactionOrderPopup /> } />
+                        <Route path="new_transaction_order/" view=move || view! { <NewTransactionOrderPopup new_order_action=new_transaction_order_action /> } />
                         <Route path="delete/:id" view=move || view! { <DeleteTransactionOrderPopup /> } />
                     </Route>
 
