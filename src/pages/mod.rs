@@ -4,3 +4,4 @@ pub mod signup_page;
 pub mod fallback_page;
 pub mod transactions;
 pub mod currency_exchange;
+pub mod transaction_orders;
