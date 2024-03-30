@@ -7,7 +7,9 @@ use crate::auth::User;
 
 #[component]
 pub fn NavBar() -> impl IntoView {
-    let user = use_context::<Resource<(usize, usize, usize), Result<Option<User>, ServerFnError>>>().expect("User resource shoud have been provided.");
+    let user =
+        use_context::<Resource<(usize, usize, usize), Result<Option<User>, ServerFnError>>>()
+            .expect("User resource shoud have been provided.");
     view! {
         <nav class="menu">
             <div class="flexBlock ul-wrapper">
@@ -43,7 +45,7 @@ pub fn NavBar() -> impl IntoView {
                                     // <li class="li-nav"><A class="link" href="/admindashboard/">"Admin Panel"</A></li>
                                     // {% endif %}
                                 }.into_view(),
-                                
+
                                 // Render this if user is not logged in
                                 Ok(None) => view!{
                                     <li class="login"><A class="transparent-purple-button" href="/login">"Zaloguj się"</A></li>

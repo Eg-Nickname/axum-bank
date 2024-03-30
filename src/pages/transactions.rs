@@ -1,15 +1,17 @@
 use leptos::*;
 use leptos_router::*;
 
-use crate::server::transactions::{NewUserTransaction, WithdrawOrder};
 use crate::auth::User;
+use crate::server::transactions::{NewUserTransaction, WithdrawOrder};
 
 #[component]
-pub fn NewTransactionPopUp(new_transaction_action: Action<NewUserTransaction, Result<(), ServerFnError>>) -> impl IntoView{
+pub fn NewTransactionPopUp(
+    new_transaction_action: Action<NewUserTransaction, Result<(), ServerFnError>>,
+) -> impl IntoView {
     view! {
         <div class="popup active">
         <A href="/transactions"><div class="overlay"></div></A>
-        
+
         <div class="content-popup">
             <ActionForm action=new_transaction_action class="new-transaction-form">
                 <h1>"Nowy Przelew"</h1>
@@ -40,10 +42,12 @@ pub fn NewTransactionPopUp(new_transaction_action: Action<NewUserTransaction, Re
         </div>
     </div>
     }
-} 
+}
 
 #[component]
-pub fn WithrawOrderPopUp(withdraw_order_action: Action<WithdrawOrder, Result<(), ServerFnError>>) -> impl IntoView{
+pub fn WithrawOrderPopUp(
+    withdraw_order_action: Action<WithdrawOrder, Result<(), ServerFnError>>,
+) -> impl IntoView {
     view! {
         <div class="popup active">
             <A href="/transactions"><div class="overlay"></div></A>
@@ -76,17 +80,20 @@ pub fn WithrawOrderPopUp(withdraw_order_action: Action<WithdrawOrder, Result<(),
 }
 
 #[component]
-fn AccountBalance() -> impl IntoView{
+fn AccountBalance() -> impl IntoView {
     // TODO UPDATE BALANCE AFTER CREATING NEW TRANSACTION
-    let balances = create_resource(|| (), move |_| {
-        use crate::server::transactions::get_user_balances;
-        get_user_balances()
-    });
+    let balances = create_resource(
+        || (),
+        move |_| {
+            use crate::server::transactions::get_user_balances;
+            get_user_balances()
+        },
+    );
 
     view! {
         <div class="info-container">
             <div class="informacje">
-                <h2>"Stan konta"</h2> 
+                <h2>"Stan konta"</h2>
                 <div class="flexBlock">
                     <A class="solid-purple-button" href="new_transaction"><i class="fas fa-plus"></i>"Nowy Przelew"</A>
                 </div>
@@ -100,7 +107,7 @@ fn AccountBalance() -> impl IntoView{
                             balances.get().map(move |res| match res {
                                 Ok(balances_list) => {
                                     balances_list.into_iter().map(move |balance|{
-                                        view!{ 
+                                        view!{
                                             <div class="info-inner-container">
                                                 <div class="currency-flag"><img src={"/images/flags/".to_owned() + &balance.currency_code + ".svg" } class="country-flag" /></div>
                                                 <div class="currency-ammount">{balance.currency_name} ": " {balance.balance}</div>
@@ -108,8 +115,8 @@ fn AccountBalance() -> impl IntoView{
                                         }.into_view()
                                     }).collect_view()
                                 },
-                                Err(_) => view! { 
-                                    <div></div> 
+                                Err(_) => view! {
+                                    <div></div>
                                 }.into_view(),
                             }).unwrap_or_default()
                         }};
@@ -126,24 +133,29 @@ fn AccountBalance() -> impl IntoView{
 }
 
 #[component]
-fn Transactions() -> impl IntoView{
+fn Transactions() -> impl IntoView {
     use crate::server::transactions::TransactionType;
     // use crate::server::transactions::TransactionStatus;
 
     let (filter_status, set_filter_status) = create_signal(false);
     // WHY THE FUCK IS THIS NOT WORKING WITH NORMAL RESOURCE GOD ONLY KNOWS
-    let transactions = create_local_resource(|| (), move |_| {
-        use crate::server::transactions::get_user_transactions;
-        get_user_transactions()
-    });
+    let transactions = create_local_resource(
+        || (),
+        move |_| {
+            use crate::server::transactions::get_user_transactions;
+            get_user_transactions()
+        },
+    );
 
-    let user = use_context::<Resource<(usize, usize, usize), Result<Option<User>, ServerFnError>>>().expect("User resource shoud have been provided.");
+    let user =
+        use_context::<Resource<(usize, usize, usize), Result<Option<User>, ServerFnError>>>()
+            .expect("User resource shoud have been provided.");
 
-    view!{
+    view! {
         <div class="transactions-container">
         <h1>"Transakcje"</h1>
-        <div>          
-            <h3>"Opcje filtrowania"</h3> 
+        <div>
+            <h3>"Opcje filtrowania"</h3>
             <label class="switch">
                 <input type="checkbox" on:click=move |_| {set_filter_status(!filter_status());} checked=false />
                 <span class="slider round"></span>
@@ -160,7 +172,7 @@ fn Transactions() -> impl IntoView{
                         //         <br>
                         //         {{field}}
                         //     </div>
-                        
+
                         //     {% for error in transaction_form.field.errors %}
                         //         <p class="login-error">{{error}}</p>
                         //     {% endfor %}
@@ -200,7 +212,7 @@ fn Transactions() -> impl IntoView{
                             transactions_list.into_iter().map(move |transaction|{
                                 let trans_type = transaction.transaction_type.clone();
                                 let reciver_for_withdraw = transaction.title.clone();
-                                view!{ 
+                                view!{
                                     // {transaction.id}
                                     {move ||{
                                         match transaction.transaction_type.clone(){
@@ -221,7 +233,7 @@ fn Transactions() -> impl IntoView{
                                             view! {<div><a style="color: rgb(0, 173, 0);">"+"{transaction.amount}</a></div>}
                                         }
                                     }}
-                                    
+
                                     <div class="currency"><a>{transaction.currency_code}</a></div>
 
                                     {move ||{
@@ -237,8 +249,8 @@ fn Transactions() -> impl IntoView{
                                 }.into_view()
                             }).collect_view()
                         },
-                        Err(_) => view! { 
-                            <div></div> 
+                        Err(_) => view! {
+                            <div></div>
                         }.into_view(),
                     }).unwrap_or_default()
                 }};
@@ -258,7 +270,7 @@ pub fn TransactionsPage() -> impl IntoView {
     view! {
         <div class="content">
             <AccountBalance />
-            
+
             <Transactions />
         </div>
     }

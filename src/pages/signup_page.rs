@@ -1,11 +1,9 @@
+use crate::auth::Signup;
 use leptos::*;
 use leptos_router::*;
-use crate::auth::Signup;
 
 #[component]
-pub fn SignupPage(
-    action: Action<Signup, Result<(), ServerFnError>>,
-) -> impl IntoView {
+pub fn SignupPage(action: Action<Signup, Result<(), ServerFnError>>) -> impl IntoView {
     view! {
         <div class="register-container">
             <ActionForm action=action>
@@ -43,7 +41,7 @@ pub fn SignupPage(
             <p style="margin-bottom: 30px;">
                 "Zaloguj się klikając w link poniżej i ciesz się możliwościami!"
             </p>
-            <A  class="transparent-purple-button" href="/login">"Zaloguj sie"</A>  
+            <A  class="transparent-purple-button" href="/login">"Zaloguj sie"</A>
         </div>
     }
 }

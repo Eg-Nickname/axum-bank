@@ -5,7 +5,6 @@ use leptos::{Errors, *};
 // use leptos_axum::ResponseOptions;
 // use thiserror::Error;
 
-
 // #[derive(Clone, Debug, Error)]
 // pub enum AppError {
 //     #[error("Not Found")]

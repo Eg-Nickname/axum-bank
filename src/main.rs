@@ -17,7 +17,7 @@ if #[cfg(feature = "ssr")] {
     use sqlx::{PgPool, postgres::{PgPoolOptions}};
     use axum_session::{SessionPgPool, SessionConfig, SessionLayer, SessionStore};
     use axum_session_auth::{AuthSession, AuthSessionLayer, AuthConfig};
-    
+
 
     use axum_bank_narody::app::*;
     use axum_bank_narody::fileserv::file_and_error_handler;
@@ -89,7 +89,7 @@ if #[cfg(feature = "ssr")] {
             // .route("/cache/image", get(image_cache_handler))
             .with_state(app_state);
 
-        
+
         // log!("listening on http://{}", &addr);
         let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
         axum::serve(listener, app.into_make_service()).await.unwrap();

@@ -1,7 +1,6 @@
 use cfg_if::cfg_if;
-use leptos::{*};
+use leptos::*;
 use serde::{Deserialize, Serialize};
-
 
 cfg_if! {
     if #[cfg(feature = "ssr")] {
@@ -29,7 +28,7 @@ cfg_if! {
 
         async fn create_transaction_order_fn(sender_id: i64, reciver_username: String, currency_code: String, amount: i64, delay_days: i64, title: String) -> Result<(), ServerFnError>{
             let pool = pool()?;
-            
+
             let reciver_id = if let Some(reciver) = User::get_from_username(reciver_username, &pool).await{
                 reciver.id
             }else {
@@ -38,13 +37,13 @@ cfg_if! {
 
             let currency_id = match sqlx::query_as!(CurrencyId, "SELECT id FROM currencies WHERE code= $1", currency_code).fetch_one(&pool).await {
                 Err(_) => { return Err(ServerFnError::ServerError("Currency: {currency_code} does not exist.".to_string())) },
-                Ok(currency) => currency.id 
+                Ok(currency) => currency.id
             };
 
             if amount < 1{
                 return Err(ServerFnError::ServerError("Amount can't be less than one.".to_string()));
             }
-            
+
             if delay_days < 1{
                 return Err(ServerFnError::ServerError("Delay can't be less than one.".to_string()));
             }
@@ -71,18 +70,17 @@ cfg_if! {
 }
 
 #[server(DeleteTransactionOrder, "/api")]
-pub async fn delete_transaction_order(trans_order_id: i64) -> Result<(), ServerFnError>{
+pub async fn delete_transaction_order(trans_order_id: i64) -> Result<(), ServerFnError> {
     match get_user().await {
         Ok(Some(user)) => {
             leptos_axum::redirect("/transaction_orders");
             delete_transaction_order_fn(trans_order_id, user.id).await
-        },
-        _ => {
-            Err(ServerFnError::ServerError("Can't get user to delete transaction order.".to_string()))
-        },
+        }
+        _ => Err(ServerFnError::ServerError(
+            "Can't get user to delete transaction order.".to_string(),
+        )),
     }
 }
-
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "ssr", derive(sqlx::FromRow))]
@@ -98,12 +96,12 @@ pub struct TransactionOrder {
 }
 
 #[server(GetUserTransactionOrders, "/api")]
-pub async fn get_user_transaction_orders() -> Result<Vec<TransactionOrder>, ServerFnError>{
+pub async fn get_user_transaction_orders() -> Result<Vec<TransactionOrder>, ServerFnError> {
     let pool = pool()?;
     let maby_user = get_user().await;
 
     match maby_user {
-        Ok(Some(user)) => {  
+        Ok(Some(user)) => {
             let mut transaction_orders = Vec::new();
             let mut rows = sqlx::query_as!(
                 TransactionOrder,
@@ -136,22 +134,36 @@ pub async fn get_user_transaction_orders() -> Result<Vec<TransactionOrder>, Serv
                 transaction_orders.push(row);
             }
             Ok(transaction_orders)
-        },
-        _ => {
-            Err(ServerFnError::ServerError("User not logged in.".to_string()))
-        },
+        }
+        _ => Err(ServerFnError::ServerError(
+            "User not logged in.".to_string(),
+        )),
     }
 }
 
 #[server(NewUserTransactionOrder, "/api")]
-pub async fn new_user_transaction_order(reciver_username: String, currency_code: String, amount: i64, delay_days: i64, title: String) -> Result<(), ServerFnError>{
+pub async fn new_user_transaction_order(
+    reciver_username: String,
+    currency_code: String,
+    amount: i64,
+    delay_days: i64,
+    title: String,
+) -> Result<(), ServerFnError> {
     match get_user().await {
         Ok(Some(user)) => {
             leptos_axum::redirect("/transaction_orders");
-            create_transaction_order_fn(user.id, reciver_username, currency_code, amount, delay_days, title).await
-        },
-        _ => {
-            Err(ServerFnError::ServerError("Can't get user to create withdraw order.".to_string()))
-        },
+            create_transaction_order_fn(
+                user.id,
+                reciver_username,
+                currency_code,
+                amount,
+                delay_days,
+                title,
+            )
+            .await
+        }
+        _ => Err(ServerFnError::ServerError(
+            "Can't get user to create withdraw order.".to_string(),
+        )),
     }
 }

@@ -1,6 +1,5 @@
 use leptos::*;
 
-
 #[component]
 pub fn FallbackPage() -> impl IntoView {
     view! {

@@ -1,25 +1,28 @@
-use leptos::*;
-use leptos_meta::*;
-use leptos_router::*;
 use crate::auth::*;
-use crate::server::transactions::{NewUserTransaction, WithdrawOrder};
-use crate::server::currency_exchange::CreateExchangeListing;
 use crate::components::navbar::NavBar;
 use crate::components::require_login::RequireLoginWithRedirect;
+use crate::pages::fallback_page::FallbackPage;
 use crate::pages::homepage::HomePage;
 use crate::pages::login_page::LoginPage;
 use crate::pages::signup_page::SignupPage;
-use crate::pages::fallback_page::FallbackPage;
+use crate::server::currency_exchange::CreateExchangeListing;
+use crate::server::transactions::{NewUserTransaction, WithdrawOrder};
+
+use leptos::*;
+use leptos_meta::*;
+use leptos_router::*;
 
 use crate::pages::transactions::TransactionsPage;
 use crate::pages::transactions::{NewTransactionPopUp, WithrawOrderPopUp};
 
-use crate::pages::currency_exchange::CurrencyExchangePage;
 use crate::pages::currency_exchange::CreateExchangeListingPopUp;
-use crate::pages::currency_exchange::DeleteExchangeListingPopUp; 
+use crate::pages::currency_exchange::CurrencyExchangePage;
+use crate::pages::currency_exchange::DeleteExchangeListingPopUp;
 use crate::pages::currency_exchange::InspectExchangeListingPopUp;
 
-
+use crate::pages::transaction_orders::DeleteTransactionOrderPopup;
+use crate::pages::transaction_orders::NewTransactionOrderPopup;
+use crate::pages::transaction_orders::TransactionOrdersPage;
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -35,18 +38,18 @@ pub fn App() -> impl IntoView {
 
     let new_exchange_order_action = create_server_action::<CreateExchangeListing>();
 
-
     // Resources
-    let user: Resource<(usize, usize, usize), Result<Option<User>, ServerFnError>> = create_resource(
-        move || {
-            (
-                login.version().get(),
-                signup.version().get(),
-                logout.version().get(),
-            )
-        },
-        move |_| get_user(),
-    );
+    let user: Resource<(usize, usize, usize), Result<Option<User>, ServerFnError>> =
+        create_resource(
+            move || {
+                (
+                    login.version().get(),
+                    signup.version().get(),
+                    logout.version().get(),
+                )
+            },
+            move |_| get_user(),
+        );
     provide_context(user);
 
     view! {
@@ -60,27 +63,38 @@ pub fn App() -> impl IntoView {
             <Routes>
                     <Route path="" view=|| view! {<HomePage/> }/>
 
-                    <Route path="/transactions/" view=|| view! { 
+                    <Route path="/transactions/" view=|| view! {
                         <RequireLoginWithRedirect>
                             <Outlet />
                             <TransactionsPage />
-                        </RequireLoginWithRedirect> 
+                        </RequireLoginWithRedirect>
                     }>
                         <Route path="/" view=|| view! {} />
                         <Route path="new_transaction/" view=move || view! { <NewTransactionPopUp new_transaction_action=new_transaction_action /> } />
                         <Route path="withdraw/" view=move || view! { <WithrawOrderPopUp withdraw_order_action=withdraw_order_action /> } />
                     </Route>
-                    
-                    <Route path="/currency_exchange/" view=|| view! { 
+
+                    <Route path="/currency_exchange/" view=|| view! {
                         <RequireLoginWithRedirect>
                             <Outlet />
                             <CurrencyExchangePage />
-                        </RequireLoginWithRedirect> 
+                        </RequireLoginWithRedirect>
                     }>
                         <Route path="/" view=|| view! {} />
                         <Route path="new_exchange_order/" view=move || view! { <CreateExchangeListingPopUp new_exchange_order_action=new_exchange_order_action /> } />
                         <Route path="exchange/:id" view=move || view! { <InspectExchangeListingPopUp />  } />
                         <Route path="delete/:id" view=move || view! { <DeleteExchangeListingPopUp /> } />
+                    </Route>
+
+                    <Route path="/transaction_orders/" view=|| view! {
+                        <RequireLoginWithRedirect>
+                            <Outlet />
+                            <TransactionOrdersPage />
+                        </RequireLoginWithRedirect>
+                    }>
+                        <Route path="/" view=|| view! {} />
+                        <Route path="new_transaction_order/" view=move || view! { <NewTransactionOrderPopup /> } />
+                        <Route path="delete/:id" view=move || view! { <DeleteTransactionOrderPopup /> } />
                     </Route>
 
 
