@@ -38,7 +38,7 @@ pub fn NewTransactionOrderPopup(
                 </div>
 
                 <div class="transacition-input-box">
-                    <input type="submit" class="solid-purple-button" value="Wyslij przelew" name="transaction" />
+                    <input type="submit" class="solid-purple-button" value="Dodaj zlecenie" name="transaction" />
                 </div>
 
             </ActionForm>
@@ -83,7 +83,57 @@ pub fn DeleteTransactionOrderPopup() -> impl IntoView {
 
 #[component]
 fn TransactionOrders() -> impl IntoView {
-    view! {}
+    let transaction_orders = create_local_resource(
+        || (),
+        move |_| {
+            use crate::server::transaction_orders::get_user_transaction_orders;
+            get_user_transaction_orders()
+        },
+    );
+
+    // pub id: i64,
+    // pub sender_id: Option<i64>,
+    // pub reciver_username: Option<String>,
+    // pub amount: i64,
+    // pub currency_code: String,
+    // pub title: String,
+    // pub transaction_delay: i32,
+    // pub last_transaction: Option<String>,
+
+    view! {
+        <div class="orders-table-top">"Odbiorca"</div>
+        <div class="orders-table-top">"Kwota"</div>
+        <div class="orders-table-top">"Waluta"</div>
+        <div class="orders-table-top">"Ostatnio wykonane"</div>
+        <div class="orders-table-top">"Cykliczność"</div>
+        <div class="orders-table-top">"Tytuł"</div>
+        <div class="orders-table-top">"Usuń"</div>
+        <Suspense fallback=move || view! {<p>"Loading..."</p> }>
+        {move || {
+            if let Some(Ok(orders_list)) = transaction_orders.get(){
+                orders_list.into_iter().map(move |order|{
+                    view!{
+                        <div class="orders-table-element">{order.reciver_username}</div>
+                        <div class="orders-table-element">{order.amount}</div>
+                        <div class="orders-table-element">{order.currency_code}</div>
+                        <div class="orders-table-element">{order.last_transaction}</div>
+                        <div class="orders-table-element">{order.transaction_delay}</div>
+                        <div class="orders-table-element">{order.title}</div>
+                        <div class="orders-table-element">
+                        {move ||{
+                            view! {<A href="./delete/".to_string() + &order.id.to_string()  class="transparent-button-del">"Usuń zlecenie"</A>}
+                        }}
+                        </div>
+
+                        }.into_view()
+                    }).collect_view()
+                }else{
+                    view!{<div></div>}.into_view()
+                }
+            }
+        }
+        </Suspense>
+    }
 }
 
 #[component]
@@ -94,7 +144,7 @@ pub fn TransactionOrdersPage() -> impl IntoView {
             <div class="flexBlock">
                 <A class="solid-purple-button" href="new_transaction_order"><i class="fas fa-plus"></i>"Dodaj zlecenie"</A>
             </div>
-            <div class="orders">
+            <div class="orders-table">
                 <TransactionOrders />
             </div>
         </div>

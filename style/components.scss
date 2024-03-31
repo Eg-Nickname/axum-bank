@@ -1,7 +1,8 @@
 // REUSABLE COMPONENTS STYLE
 
 // BUTTONS
-input, button{
+input,
+button {
 	box-sizing: border-box;
 	display: flex;
 	flex-direction: row;
@@ -23,7 +24,7 @@ input, button{
 	flex-grow: 0;
 }
 
-.solid-purple-button{
+.solid-purple-button {
 	color: $neutral-000;
 	background-color: $primary-main;
 	border-radius: 4px;
@@ -37,18 +38,18 @@ input, button{
 	align-items: center;
 }
 
-.solid-purple-button:hover{
+.solid-purple-button:hover {
 	background-color: $primary-border;
 	border-color: $primary-bg;
 }
 
-.solid-purple-button:active{
+.solid-purple-button:active {
 	background-color: $primary-pressed;
 	border-color: $primary-bg;
 }
 
 // Red button
-.button-del{
+.button-del {
 	color: $neutral-000;
 	background-color: $danger-main !important;
 	transition: all 0.2s ease-in;
@@ -60,61 +61,86 @@ input, button{
 	align-items: center;
 }
 
-.button-del:hover{
+.button-del:hover {
 	background-color: $danger-border !important;
 	border-color: $danger-bg !important;
 	color: $danger-pressed !important;
 	font-weight: 600;
 }
 
-.button-del:active{
+.button-del:active {
 	background-color: $danger-pressed;
 	border-color: $danger-bg;
 	color: $neutral-000;
 }
 
+.transparent-button-del {
+	color: $danger-main;
+	background: $danger-bg;
+	border: 2px solid $danger-border;
+	padding: 10px;
+	margin: 5px;
+	border-radius: 4px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-weight: 600;
+	-webkit-transition: 0.4s;
+	transition: 0.4s;
+}
+
+.transparent-button-del:hover {
+	border: 2px solid $danger-hover;
+	color: $danger-hover;
+}
+
+.transparent-button-del:active {
+	border: 2px solid $danger-focus;
+}
+
 // Nice transparent purple buttons used in nav
-.transparent-purple-button{
+.transparent-purple-button {
 	color: $primary-main;
 	background: $primary-bg;
 	border: 2px solid $primary-border;
 	min-width: 200px;
 	border-radius: 4px;
-    font-weight: 600;
+	font-weight: 600;
 	padding: 8px;
 	margin: 5px;
 	-webkit-transition: 0.4s;
 	transition: 0.4s;
 }
-.transparent-purple-button:hover{
+
+.transparent-purple-button:hover {
 	border: 2px solid $primary-hover;
 	color: $primary-hover;
 }
 
-.transparent-purple-button:active{
+.transparent-purple-button:active {
 	border: 2px solid $primary-focus;
 }
 
 // Default text input
-.text-input{
-    width: 300px;
-    padding: 0 20px;
-    width: 256px;
-    color: #444;
-    line-height: 28px;
-    border: 1px solid #aaa;
-    border-radius: 4px;
-    transition: 300ms all;
+.text-input {
+	width: 300px;
+	padding: 0 20px;
+	width: 256px;
+	color: #444;
+	line-height: 28px;
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	transition: 300ms all;
 }
 
-input:-webkit-autofill:focus, 
+input:-webkit-autofill:focus,
 .text-input:focus {
-    border: 2px solid $primary-hover !important;
+	border: 2px solid $primary-hover !important;
 }
 
 input:-webkit-autofill:hover,
 .text-input:hover {
-    border: 2px solid $primary-border;
+	border: 2px solid $primary-border;
 }
 
 
@@ -122,11 +148,11 @@ input:-webkit-autofill:hover,
 // TODO NAPRAWIĆ STYL
 input:-webkit-autofill,
 input:-webkit-autofill:active,
-.input-box input{
-    background: none !important;
-    background-color: transparent !important;
-    outline: none;
-    border: none;
-    -webkit-box-shadow: 0 0 0 30px #f0f0f0 inset !important;
-    box-shadow: 0 0 0 30px #f0f0f0 inset !important;
+.input-box input {
+	background: none !important;
+	background-color: transparent !important;
+	outline: none;
+	border: none;
+	-webkit-box-shadow: 0 0 0 30px #f0f0f0 inset !important;
+	box-shadow: 0 0 0 30px #f0f0f0 inset !important;
 }

@@ -1,109 +1,21 @@
-#NewTransactionOrder_reciver_fk{
-    width: 300px;
+.orders-container {
+    margin: 0 32px 0;
 }
 
-#NewTransactionOrder_title{
-    width: 300px;
-}
-#NewTransactionOrder_amount,  #NewTransactionOrder_title{
-    padding: 0 20px;
-    width: 256px;
-    color: #444;
-    line-height: 28px;
-    border: 1px solid #aaa;
-    border-radius: 4px;
-}
-#NewTransactionOrder_waluta, #NewTransactionOrder_transaction_delay{
-    width: 300px;
-}
-.buton-zlecenie{
-    width: 230px !important;
-}
-
-#id_waluta, #id_transaction_delay, #id_reciver_fk{
-    width: 300px !important;
-}
-
-.content{
-    grid-template-columns: minmax(0, 1fr);
-    column-gap: 0;
-}
-
-.transaction-orders-container{
-    margin: 0 24px;
-}
-
-.info-container{
-    margin: 0 24px;
-}
-
-/* Transaction orders */
-.transaction-orders-wrapper{
+.orders-table {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 60px minmax(0, 2fr) minmax(0, 1fr) 140px;
-    grid-auto-rows: minmax(50px auto);
-    row-gap: 16px;
-    column-gap: 16px;
-    overflow-wrap: break-word;
-}
-.transaction-orders-wrapper .collumn-name{
-    font-size: 18px;
-    color: $neutral-700;
-    font-weight: 600;
-    display: flex;
-    justify-content: center;
-    
+    grid-template-columns: minmax(0, 250px) minmax(0, 1fr) minmax(0, 70px) minmax(0, 200px) minmax(0, 200px) minmax(0, 2fr) 200px;
+    column-gap: 1px;
+    row-gap: 1px;
+    background-color: #aaa;
 }
 
-.transaction-orders-wrapper .currency{
-    display: flex;
-    justify-content: center;
+.orders-table-top {
+    background-color: #fff;
+    padding: 3px;
 }
 
-@media (max-width: 950px){
-    .transaction-orders-wrapper{
-        display: grid;
-        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr)  80px 80px minmax(0, 2fr) 140px;
-        grid-auto-rows: minmax(50px auto);
-        row-gap: 16px;
-        column-gap: 16px;
-        overflow-wrap: break-word;
-    }
-
-    .transaction-orders-wrapper .title, .transaction-orders-wrapper #title{
-        display: none;
-    }
-}
-
-@media (max-width: 780px){
-    .transaction-orders-wrapper{
-        display: grid;
-        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) 80px 60px 140px;
-        grid-auto-rows: minmax(50px auto);
-        row-gap: 16px;
-        column-gap: 16px;
-        overflow-wrap: break-word;
-    }
-
-    .transaction-orders-wrapper .date, .transaction-orders-wrapper #date{
-        display: none;
-    }
-}
-
-@media (max-width: 560px){
-    .transaction-orders-wrapper{
-        display: grid;
-        grid-template-columns: minmax(80px, 2fr) minmax(40px, 1fr) 80px minmax(90px, 140px);
-        grid-auto-rows: minmax(50px auto);
-        row-gap: 16px;
-        column-gap: 16px;
-        overflow-wrap: break-word;
-    }
-
-    .transaction-orders-wrapper .delay, .transaction-orders-wrapper #delay{
-        display: none;
-    }
-    .transaction-orders-wrapper .del a{
-        content: "Usuń";
-    }
+.orders-table-element {
+    background-color: #fff;
+    padding: 3px;
 }
