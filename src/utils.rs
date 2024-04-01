@@ -1,10 +1,16 @@
 use cfg_if::cfg_if;
+use leptos::*;
+
+use crate::auth::User;
+pub type UserContextType =
+    Resource<(usize, usize, usize, usize), Result<Option<User>, ServerFnError>>;
 
 cfg_if! {
     if #[cfg(feature = "ssr")] {
         use crate::auth::AuthSession;
         use sqlx::PgPool;
-        use leptos::*;
+
+
 
         pub fn pool() -> Result<PgPool, ServerFnError> {
             use_context::<PgPool>()

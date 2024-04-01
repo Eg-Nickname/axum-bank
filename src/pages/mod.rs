@@ -1,3 +1,4 @@
+pub mod account;
 pub mod currency_exchange;
 pub mod fallback_page;
 pub mod homepage;

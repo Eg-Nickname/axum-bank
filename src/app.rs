@@ -5,6 +5,7 @@ use crate::pages::fallback_page::FallbackPage;
 use crate::pages::homepage::HomePage;
 use crate::pages::login_page::LoginPage;
 use crate::pages::signup_page::SignupPage;
+use crate::server::account::ChangePassword;
 use crate::server::currency_exchange::CreateExchangeListing;
 use crate::server::transaction_orders::NewUserTransactionOrder;
 use crate::server::transactions::{NewUserTransaction, WithdrawOrder};
@@ -25,6 +26,8 @@ use crate::pages::transaction_orders::DeleteTransactionOrderPopup;
 use crate::pages::transaction_orders::NewTransactionOrderPopup;
 use crate::pages::transaction_orders::TransactionOrdersPage;
 
+use crate::pages::account::AccountPage;
+
 #[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();
@@ -33,6 +36,7 @@ pub fn App() -> impl IntoView {
     let login = create_server_action::<Login>();
     let logout = create_server_action::<Logout>();
     let signup = create_server_action::<Signup>();
+    let change_password = create_server_action::<ChangePassword>();
 
     let new_transaction_action = create_server_action::<NewUserTransaction>();
     let withdraw_order_action = create_server_action::<WithdrawOrder>();
@@ -40,18 +44,19 @@ pub fn App() -> impl IntoView {
     let new_exchange_order_action = create_server_action::<CreateExchangeListing>();
     let new_transaction_order_action = create_server_action::<NewUserTransactionOrder>();
 
+    use crate::utils::UserContextType;
     // Resources
-    let user: Resource<(usize, usize, usize), Result<Option<User>, ServerFnError>> =
-        create_resource(
-            move || {
-                (
-                    login.version().get(),
-                    signup.version().get(),
-                    logout.version().get(),
-                )
-            },
-            move |_| get_user(),
-        );
+    let user: UserContextType = create_resource(
+        move || {
+            (
+                login.version().get(),
+                signup.version().get(),
+                logout.version().get(),
+                change_password.version().get(),
+            )
+        },
+        move |_| get_user(),
+    );
     provide_context(user);
 
     view! {
@@ -99,6 +104,11 @@ pub fn App() -> impl IntoView {
                         <Route path="delete/:id" view=move || view! { <DeleteTransactionOrderPopup /> } />
                     </Route>
 
+                    <Route path="account/" view=move || view! {
+                        <RequireLoginWithRedirect>
+                            <AccountPage change_password_action=change_password />
+                        </RequireLoginWithRedirect>
+                    }/>
 
                     <Route path="signup/" view=move || view! {
                         <SignupPage action=signup/>

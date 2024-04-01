@@ -1,3 +1,4 @@
+pub mod account;
 pub mod currency_exchange;
 pub mod items;
 pub mod items_offers;

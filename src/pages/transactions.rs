@@ -1,8 +1,8 @@
 use leptos::*;
 use leptos_router::*;
 
-use crate::auth::User;
 use crate::server::transactions::{NewUserTransaction, WithdrawOrder};
+use crate::utils::UserContextType;
 
 #[component]
 pub fn NewTransactionPopUp(
@@ -147,9 +147,7 @@ fn Transactions() -> impl IntoView {
         },
     );
 
-    let user =
-        use_context::<Resource<(usize, usize, usize), Result<Option<User>, ServerFnError>>>()
-            .expect("User resource shoud have been provided.");
+    let user = use_context::<UserContextType>().expect("User resource shoud have been provided.");
 
     view! {
         <div class="transactions-container">

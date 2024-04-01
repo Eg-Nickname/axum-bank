@@ -1,12 +1,10 @@
+use crate::utils::UserContextType;
 use leptos::*;
 /// Component that ensures that page is not shown user if user is not logged in. If user is logged displays children components.
 #[component]
 pub fn require_login_with_redirect(children: ChildrenFn) -> impl IntoView {
-    use crate::auth::User;
     use leptos_router::Redirect;
-    let user =
-        use_context::<Resource<(usize, usize, usize), Result<Option<User>, ServerFnError>>>()
-            .expect("User resource shoud have been provided.");
+    let user = use_context::<UserContextType>().expect("User resource shoud have been provided.");
 
     view! {
         <Suspense
@@ -33,10 +31,7 @@ pub fn require_login_with_redirect(children: ChildrenFn) -> impl IntoView {
 /// Comonent showing children components only to logged users.
 #[component]
 pub fn require_login(children: ChildrenFn) -> impl IntoView {
-    use crate::auth::User;
-    let user =
-        use_context::<Resource<(usize, usize, usize), Result<Option<User>, ServerFnError>>>()
-            .expect("User resource shoud have been provided.");
+    let user = use_context::<UserContextType>().expect("User resource shoud have been provided.");
     let (show_children, set_show_children) = create_signal(false);
     view! {
         <Suspense

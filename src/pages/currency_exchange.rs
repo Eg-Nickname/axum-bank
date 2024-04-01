@@ -6,7 +6,7 @@ use crate::server::currency_exchange::{
 use leptos::*;
 use leptos_router::*;
 
-use crate::auth::User;
+use crate::utils::UserContextType;
 
 #[derive(Params, PartialEq, Clone)]
 struct ListingParams {
@@ -180,9 +180,7 @@ pub fn CurrencyExchangePage() -> impl IntoView {
 
 #[component]
 fn ExchangeListings() -> impl IntoView {
-    let user =
-        use_context::<Resource<(usize, usize, usize), Result<Option<User>, ServerFnError>>>()
-            .expect("User resource shoud have been provided.");
+    let user = use_context::<UserContextType>().expect("User resource shoud have been provided.");
 
     let query = use_query_map();
 

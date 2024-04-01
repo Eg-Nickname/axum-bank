@@ -7,9 +7,9 @@ use crate::auth::User;
 
 #[component]
 pub fn NavBar() -> impl IntoView {
-    let user =
-        use_context::<Resource<(usize, usize, usize), Result<Option<User>, ServerFnError>>>()
-            .expect("User resource shoud have been provided.");
+    use crate::utils::UserContextType;
+
+    let user = use_context::<UserContextType>().expect("User resource shoud have been provided.");
     view! {
         <nav class="menu">
             <div class="flexBlock ul-wrapper">
@@ -38,7 +38,7 @@ pub fn NavBar() -> impl IntoView {
                             user.get().map(|user| match user {
                                 // Render this if user is logged in
                                 Ok(Some(_user)) => view! {
-                                    <li class="login"><A class="transparent-purple-button" href="/account/">"Ustawienia"</A></li>
+                                    <li class="login"><A class="transparent-purple-button" href="/account">"Ustawienia"</A></li>
                                     <li class="login li-responsive"><a rel="external" class="transparent-purple-button" href="/api/logout">"Wyloguj się"</a></li>
                                     // TODO ADD ADMIN DASHBOARD LINK
                                     // {% if user.is_superuser %}
