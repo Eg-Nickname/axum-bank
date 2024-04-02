@@ -28,5 +28,30 @@ pub fn AccountPage(
                 </div>
             </ActionForm>
         </div>
+
+        <div class="api-container">
+            // Send request for generation permission
+            // If granted add api token generator
+
+            // <form action=change_password_action>
+            //     <h1>"Dodaj token API"</h1>
+            //     <div class="input-box1">
+            //         <i>"Stare hasło"</i>
+            //         <input type="password" placeholder="Stare hasło" name="old_password" class="text-input" />
+            //     </div>
+
+            //     <div class="transacition-input-box">
+            //         <input type="submit" class="solid-purple-button" value="Wygeneruj token API" name="transaction" />
+            //     </div>
+            // </form>
+
+
+            // If token present
+
+            // Delete button
+            // Warning of problems with token
+            // Regenerate Token button
+            // Api documentation
+        </div>
     }
 }

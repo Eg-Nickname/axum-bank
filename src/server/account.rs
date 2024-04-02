@@ -1,3 +1,4 @@
+use axum_session_auth::HasPermission;
 use cfg_if::cfg_if;
 use leptos::*;
 use serde::{Deserialize, Serialize};
@@ -72,6 +73,82 @@ pub async fn change_password(
         }
         _ => Err(ServerFnError::ServerError(
             "Can't get user to change password.".to_string(),
+        )),
+    }
+}
+
+#[server(GenerateApiToken, "/api")]
+pub async fn generate_api_token() -> Result<(), ServerFnError> {
+    match get_user().await {
+        Ok(Some(user)) => {
+            // Check if user has api permission
+            if user.has("api_token_gen", &None).await {
+                let pool = pool()?;
+
+                // Generate new Token
+                use rand::{distributions::Alphanumeric, Rng};
+                let api_token: String = rand::thread_rng()
+                    .sample_iter(&Alphanumeric)
+                    .take(32)
+                    .map(char::from)
+                    .collect();
+
+                // Update token to Db
+                if sqlx::query!(
+                    "UPDATE users SET api_token=$1 WHERE id=$2",
+                    api_token,
+                    user.id
+                )
+                .execute(&pool)
+                .await
+                .is_err()
+                {
+                    return Err(ServerFnError::ServerError(
+                        "Error during updating api_key in DB".to_string(),
+                    ));
+                };
+            } else {
+                // Return error if user doesn't have api key permission
+                return Err(ServerFnError::ServerError(
+                    "User can't generate API token.".to_string(),
+                ));
+            }
+
+            leptos_axum::redirect("/account");
+            Ok(())
+        }
+        _ => Err(ServerFnError::ServerError(
+            "Can't get user to generate API token.".to_string(),
+        )),
+    }
+}
+
+struct ApiToken {
+    api_token: Option<String>,
+}
+#[server(GetApiToken, "/api")]
+pub async fn get_api_token() -> Result<Option<String>, ServerFnError> {
+    match get_user().await {
+        Ok(Some(user)) => {
+            let pool = pool()?;
+
+            let token =
+                match sqlx::query_as!(ApiToken, "SELECT api_token FROM users WHERE id=$1", user.id)
+                    .fetch_one(&pool)
+                    .await
+                {
+                    Err(_) => {
+                        return Err(ServerFnError::ServerError(
+                            "Couldn't get api token.".to_string(),
+                        ))
+                    }
+                    Ok(api_token) => api_token.api_token,
+                };
+
+            Ok(token)
+        }
+        _ => Err(ServerFnError::ServerError(
+            "Can't get user to get API token.".to_string(),
         )),
     }
 }
