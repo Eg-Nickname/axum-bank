@@ -169,10 +169,8 @@ pub async fn login(
 
     let user: User = User::get_from_username(username.clone(), &pool)
         .await
-        .ok_or_else(|| {
-            ServerFnError::new("User does not exist.")
-        })?;
-        // warn!("user logged in {}", username);
+        .ok_or_else(|| ServerFnError::new("User does not exist."))?;
+    // warn!("user logged in {}", username);
     match verify(password, &user.password)? {
         true => {
             auth.login_user(user.id);
@@ -193,7 +191,6 @@ pub async fn signup(
     password_confirmation: String,
     remember: Option<String>,
 ) -> Result<(), ServerFnError> {
-    
     let pool = pool()?;
     let auth = auth()?;
 
@@ -206,25 +203,20 @@ pub async fn signup(
     let password_hashed = hash(password, DEFAULT_COST).unwrap();
 
     sqlx::query!(
-            // language=PostgreSQL
-            r#"
+        // language=PostgreSQL
+        r#"
                 insert into users(username, password)
                 values ($1, $2)
             "#,
-            username.clone(),
-            password_hashed
-        )
-        .execute(&pool)
-        .await?;
+        username.clone(),
+        password_hashed
+    )
+    .execute(&pool)
+    .await?;
 
-    let user =
-        User::get_from_username(username, &pool)
-            .await
-            .ok_or_else(|| {
-                ServerFnError::new(
-                    "Signup failed: User does not exist.",
-                )
-            })?;
+    let user = User::get_from_username(username, &pool)
+        .await
+        .ok_or_else(|| ServerFnError::new("Signup failed: User does not exist."))?;
 
     auth.login_user(user.id);
     auth.remember_user(remember.is_some());
@@ -242,4 +234,14 @@ pub async fn logout() -> Result<(), ServerFnError> {
     leptos_axum::redirect("/");
 
     Ok(())
+}
+
+#[server(CheckPermission, "/api")]
+pub async fn check_user_permission(permission: String) -> Result<bool, ServerFnError> {
+    match get_user().await {
+        Ok(Some(user)) => Ok(user.has(&permission, &None).await),
+        _ => Err(ServerFnError::ServerError(
+            "Can't get user to check permission.".to_string(),
+        )),
+    }
 }
