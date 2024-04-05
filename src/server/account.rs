@@ -1,4 +1,3 @@
-use axum_session_auth::HasPermission;
 use cfg_if::cfg_if;
 use leptos::*;
 use serde::{Deserialize, Serialize};
@@ -8,6 +7,7 @@ cfg_if! {
         use crate::utils::pool;
         use crate::auth::get_user;
         use crate::auth::User;
+        use axum_session_auth::HasPermission;
         use sqlx::query;
         use bcrypt::{hash, verify, DEFAULT_COST};
         use tracing::warn;
@@ -149,6 +149,19 @@ pub async fn get_api_token() -> Result<Option<String>, ServerFnError> {
         }
         _ => Err(ServerFnError::ServerError(
             "Can't get user to get API token.".to_string(),
+        )),
+    }
+}
+
+#[server(AddUserRequest, "/api")]
+pub async fn add_user_request() -> Result<(), ServerFnError> {
+    match get_user().await {
+        Ok(Some(user)) => {
+            // TODO add request adding handler function
+            Ok(())
+        }
+        _ => Err(ServerFnError::ServerError(
+            "Can't get user to create user request.".to_string(),
         )),
     }
 }
