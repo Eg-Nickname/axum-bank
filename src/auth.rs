@@ -235,3 +235,13 @@ pub async fn logout() -> Result<(), ServerFnError> {
 
     Ok(())
 }
+
+#[server(CheckPermission, "/api")]
+pub async fn check_user_permission(permission: String) -> Result<bool, ServerFnError> {
+    match get_user().await {
+        Ok(Some(user)) => Ok(user.has(&permission, &None).await),
+        _ => Err(ServerFnError::ServerError(
+            "Can't get user to check permission.".to_string(),
+        )),
+    }
+}
