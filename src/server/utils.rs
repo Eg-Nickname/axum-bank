@@ -49,6 +49,7 @@ cfg_if! {
         }
 
         pub async fn create_user_request(user_id: i64, request_mesage: String, request_type: UserRequestType) -> Result<(), ServerFnError>{
+            // Add data to database
             todo!()
         }
     }
