@@ -18,7 +18,7 @@
 // if #[cfg(feature = "ssr")] {
 //     use crate::utils::pool;
 //     use sqlx::{query_builder::QueryBuilder, Postgres, PgPool};
-    
+
 //     #[allow(dead_code)]
 //     struct ValidatedItemsQueryData {
 //         page: u32,
@@ -49,33 +49,33 @@
 //                 // TODO: Dodać wyświetlanie tej opcji przy filtrowaniu kolorami
 //                 // "color-distance" => "color-distance".to_string(),
 //                 "default" | _ => "items.id".to_string(),
-//             }; 
+//             };
 
 //             let valid_sort_order = match self.sort_order.as_str() {
 //                 "A-Z" => "ASC".to_string(),
 //                 "Z-A" | _ => "DESC".to_string()
-//             }; 
+//             };
 //             let valid_color_search = self.color_search;
 
 //             use colors_transform::{Rgb, Color};
 //             let parsed_color = Rgb::from_hex_str(self.color.as_str()).unwrap_or(Rgb::from(0.0, 0.0, 0.0));
 //             let valid_color = (parsed_color.get_red() as f64, parsed_color.get_green() as f64, parsed_color.get_blue() as f64);
-//             let valid_color_distance = self.color_distance.parse::<u32>().unwrap_or_default(); 
+//             let valid_color_distance = self.color_distance.parse::<u32>().unwrap_or_default();
 
-//             ValidatedItemsQueryData { 
-//                 page: valid_page, 
-//                 item_name: valid_item_name, 
-//                 language: valid_language, 
-//                 sort_by: valid_sort_by, 
+//             ValidatedItemsQueryData {
+//                 page: valid_page,
+//                 item_name: valid_item_name,
+//                 language: valid_language,
+//                 sort_by: valid_sort_by,
 //                 sort_order: valid_sort_order,
 //                 color_search: valid_color_search,
-//                 color: valid_color, 
-//                 color_distance: valid_color_distance 
+//                 color: valid_color,
+//                 color_distance: valid_color_distance
 //             }
 //         }
 //     }
-// // SELECT items.id, items.display_name_eng, SUM(colors.color_index) 
-// // FROM items INNER JOIN colors ON items.id = colors.item_id 
+// // SELECT items.id, items.display_name_eng, SUM(colors.color_index)
+// // FROM items INNER JOIN colors ON items.id = colors.item_id
 // // GROUP BY items.id
 // // ORDER BY items.id
 // // LIMIT 100
@@ -86,7 +86,6 @@
 
 //             query.push("SELECT items.id, items.item_name, items.display_name_eng, items.display_name_pl, items.item_meta, items.minecraft_item_id, items.has_nbt, items.filename, COALESCE(SUM(colors.color_index),0) AS color_similiarity ");
 //             query.push("FROM items INNER JOIN colors ON items.id = colors.item_id WHERE ");
-
 
 //             query.push(" (LOWER(items.display_name_eng) LIKE ");
 //             query.push_bind(self.item_name.clone());
@@ -110,14 +109,14 @@
 
 //             query.push(" ORDER BY ");
 //             query.push(self.sort_by.clone());
-            
+
 //             if self.sort_by == "items.minecraft_item_id"{
 //                 query.push("::INT ");
 //             }
 
 //             query.push(" ");
 //             query.push(self.sort_order);
-            
+
 //             query.push(" LIMIT 100 OFFSET ");
 //             query.push_bind((self.page*100) as i64);
 
@@ -128,9 +127,9 @@
 //             while let Some(row) = rows.try_next().await? {
 //                 items.push(row);
 //             }
-        
+
 //             Ok(items)
-//         }   
+//         }
 //     }
 // }}
 

@@ -4,11 +4,11 @@ use cfg_if::cfg_if;
 pub mod app;
 pub mod auth;
 pub mod components;
-pub mod pages;
 pub mod fileserv;
-pub mod utils;
-pub mod state;
+pub mod pages;
 pub mod server;
+pub mod state;
+pub mod utils;
 
 cfg_if! { if #[cfg(feature = "hydrate")] {
     use leptos::*;

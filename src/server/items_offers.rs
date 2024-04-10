@@ -2,7 +2,6 @@
 // use leptos::*;
 // use serde::{Deserialize, Serialize};
 
-
 // // #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 // // pub struct ItemOffer {
 // //     pub author: String,
@@ -71,26 +70,26 @@
 //     }
 //     impl ValidatedItemOffersQueryData {
 //         /// Querry builder and executor for item offers
-//         /// 
+//         ///
 //         /// **EXAMPLE QUERRY BUILDER OUTPUT**
 //         /// ```sql
-//         /// SELECT 
-//         ///     users.username as author, 
-//         ///     items.display_name_eng as item, 
-//         ///     item_offers.title as title, 
-//         ///     item_offers.description as description, 
+//         /// SELECT
+//         ///     users.username as author,
+//         ///     items.display_name_eng as item,
+//         ///     item_offers.title as title,
+//         ///     item_offers.description as description,
 //         ///     item_offers.packets as packets,
 //         ///     cast(item_offers.items_per_packet as double precision) / cast(item_offers_prices.price as double precision) as price_per_item
-//         /// FROM (((item_offers_prices 
-//         ///     INNER JOIN currencies ON item_offers_prices.currency_id = currencies.id) 
-//         ///     INNER JOIN item_offers ON item_offers_prices.offer_id = item_offers.id) 
-//         ///     INNER JOIN users ON item_offers.author_id = users.id) 
+//         /// FROM (((item_offers_prices
+//         ///     INNER JOIN currencies ON item_offers_prices.currency_id = currencies.id)
+//         ///     INNER JOIN item_offers ON item_offers_prices.offer_id = item_offers.id)
+//         ///     INNER JOIN users ON item_offers.author_id = users.id)
 //         ///     INNER JOIN items ON item_offers.item_id = items.id
 //         /// WHERE
 //         ///     users.username LIKE '%'
 //         ///     AND cast(item_offers.items_per_packet as double precision) / cast(item_offers_prices.price as double precision) < 10.0
 //         ///     AND currencies.name = 'yen'
-//         /// ORDER BY 
+//         /// ORDER BY
 //         ///     price_per_item DESC;
 //         /// LIMIT 100 OFFSET 100
 //         /// ```
@@ -115,7 +114,7 @@
 
 //             query.push(" ");
 //             query.push(self.sort_order);
-            
+
 //             query.push(" LIMIT 100 OFFSET ");
 //             query.push_bind((self.page*100) as i64);
 
@@ -127,12 +126,11 @@
 //             while let Some(row) = rows.try_next().await? {
 //                 item_offers.push(row);
 //             }
-        
+
 //             Ok(item_offers)
 //         }
 //     }
 // }}
-
 
 // #[server(GetItemOffers, "/api")]
 // pub async fn get_item_offers(cx: Scope, query_data: ItemOffersQueryData) -> Result<Vec<SimpleItemOffer>, ServerFnError> {
