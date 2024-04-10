@@ -18,7 +18,7 @@ $$
 
 ;
 
-CREATE TRIGGER new_user_balance
+CREATE OR REPLACE TRIGGER new_user_balance
     AFTER INSERT
     ON users
     FOR EACH ROW

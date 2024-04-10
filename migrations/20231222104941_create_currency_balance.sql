@@ -18,7 +18,7 @@ $$
 
 ;
 
-CREATE TRIGGER new_currency
+CREATE OR REPLACE TRIGGER new_currency
     AFTER INSERT
     ON currencies
     FOR EACH ROW
