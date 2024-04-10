@@ -1,6 +1,7 @@
 use leptos::*;
 use leptos_router::*;
 
+use crate::components::require_perm::RequirePerm;
 use crate::server::account::ChangePassword;
 
 #[component]
@@ -28,6 +29,13 @@ pub fn AccountPage(
                 </div>
             </ActionForm>
         </div>
+        <RequirePerm permission="api".to_string()>
+            <h1>"To jest tylko widoczne dla użytkownika z permisją api"</h1>
+        </RequirePerm>
+
+        <RequirePerm permission="admin".to_string()>
+            <h1>"To jest tylko widoczne dla użytkownika z permisją admin"</h1>
+        </RequirePerm>
 
         <div class="api-container">
             // Send request for generation permission
