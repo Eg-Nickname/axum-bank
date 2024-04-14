@@ -52,6 +52,53 @@ cfg_if! {
 
             Ok(())
         }
+
+        #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+        #[cfg_attr(feature = "ssr", derive(sqlx::Type))]
+        #[repr(i32)]
+        pub enum UserRequestType{
+            Other = 0,
+            GetApiPerm = 1,
+            AddCurrency = 2,
+        }
+
+        impl From<i32> for UserRequestType {
+            fn from(number: i32) -> Self {
+                match number {
+                    2 => UserRequestType::AddCurrency,
+                    1 => UserRequestType::GetApiPerm,
+                    _ => UserRequestType::Other,
+                }
+            }
+        }
+
+        impl From<String> for UserRequestType {
+            fn from(text: String) -> Self {
+                match text.as_str() {
+                    "AddCurrency" => UserRequestType::AddCurrency,
+                    "GetApiPerm" => UserRequestType::GetApiPerm,
+                    _ => UserRequestType::Other,
+                }
+            }
+        }
+
+        pub async fn create_user_request(user_id: i64, request_mesage: String, request_type: UserRequestType) -> Result<(), ServerFnError>{
+            let pool = pool()?;
+            if user_id < 0{
+                return Err(ServerFnError::ServerError("User id is not valid".to_string()));
+            }
+
+            if query!(
+                "INSERT INTO user_requests(request_user, request_mesage, request_type) VALUES ($1, $2, $3);",
+                user_id,
+                request_mesage,
+                request_type as UserRequestType
+            ).execute(&pool)
+            .await.is_err(){
+                return Err(ServerFnError::ServerError("Internal error during creating user request.".to_string()));
+            }
+            Ok(())
+        }
     }
 }
 
@@ -153,13 +200,36 @@ pub async fn get_api_token() -> Result<Option<String>, ServerFnError> {
     }
 }
 
-#[server(AddUserRequest, "/api")]
-pub async fn add_user_request() -> Result<(), ServerFnError> {
+#[server(DeleteApiToken, "/api")]
+pub async fn delete_api_token() -> Result<(), ServerFnError> {
     match get_user().await {
         Ok(Some(user)) => {
-            // TODO add request adding handler function
+            let pool = pool()?;
+            if sqlx::query!("UPDATE users SET api_token=Null WHERE id=$1", user.id)
+                .execute(&pool)
+                .await
+                .is_err()
+            {
+                return Err(ServerFnError::ServerError(
+                    "Can't reset user API toekn".to_string(),
+                ));
+            }
+
             Ok(())
         }
+        _ => Err(ServerFnError::ServerError(
+            "Can't get user to delete API token.".to_string(),
+        )),
+    }
+}
+
+#[server(AddUserRequest, "/api")]
+pub async fn add_user_request(
+    request_message: String,
+    request_type: String,
+) -> Result<(), ServerFnError> {
+    match get_user().await {
+        Ok(Some(user)) => create_user_request(user.id, request_message, request_type.into()).await,
         _ => Err(ServerFnError::ServerError(
             "Can't get user to create user request.".to_string(),
         )),
