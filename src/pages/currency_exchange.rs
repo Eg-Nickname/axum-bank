@@ -14,12 +14,12 @@ struct ListingParams {
 }
 
 #[component]
-pub fn InspectExchangeListingPopUp() -> impl IntoView {
+pub fn InspectExchangeListingPopUp(
+    exchange_action: Action<UserExchangeCurrencies, Result<(), ServerFnError>>,
+) -> impl IntoView {
     let params = use_params::<ListingParams>();
     let listing_id =
         move || params.with(|params| params.as_ref().map(|params| params.id).unwrap_or(-1));
-
-    let action = create_server_action::<UserExchangeCurrencies>();
 
     let listing = create_resource(listing_id, move |_| get_exchange_listing(listing_id()));
 
@@ -27,7 +27,7 @@ pub fn InspectExchangeListingPopUp() -> impl IntoView {
         <div class="popup active">
         <A href="/currency_exchange"><div class="overlay"></div></A>
         <div class="content-popup">
-        <ActionForm action=action>
+        <ActionForm action=exchange_action>
             <h1>"Czy chcesz wymienić waluty?"</h1>
                 <Suspense fallback=move || view! {<p>"Loading..."</p> }>
                 {move||{
@@ -70,11 +70,12 @@ pub fn InspectExchangeListingPopUp() -> impl IntoView {
 }
 
 #[component]
-pub fn DeleteExchangeListingPopUp() -> impl IntoView {
+pub fn DeleteExchangeListingPopUp(
+    delete_action: Action<DeleteExchangeListing, Result<(), ServerFnError>>,
+) -> impl IntoView {
     let params = use_params::<ListingParams>();
     let listing_id =
         move || params.with(|params| params.as_ref().map(|params| params.id).unwrap_or(-1));
-    let action = create_server_action::<DeleteExchangeListing>();
 
     view! {
         <div class="popup active">
@@ -82,7 +83,7 @@ pub fn DeleteExchangeListingPopUp() -> impl IntoView {
 
 
         <div class="content-popup">
-        <ActionForm action=action>
+        <ActionForm action=delete_action>
             <h1>"Czy chcesz usunąć oferte wymiany?"</h1>
             <div class="delete_exchange_listing_form">
                 <input type="hidden" value={listing_id} name="listing_id" />
@@ -200,8 +201,13 @@ fn ExchangeListings() -> impl IntoView {
         }
     });
 
-    let exchange_listings =
-        create_resource(query_data, move |_| get_exchange_listings(query_data()));
+    use crate::utils::ExchangeOffersReload;
+    let exchange_listings_source = use_context::<ExchangeOffersReload>().unwrap().0;
+
+    let exchange_listings = create_resource(
+        move || (query_data(), exchange_listings_source()),
+        move |_| get_exchange_listings(query_data()),
+    );
 
     view! {
         <Transition fallback=move || view! {<p>"Loading..."</p> }>

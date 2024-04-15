@@ -54,11 +54,12 @@ struct ListingParams {
 }
 
 #[component]
-pub fn DeleteTransactionOrderPopup() -> impl IntoView {
+pub fn DeleteTransactionOrderPopup(
+    delete_action: Action<DeleteTransactionOrder, Result<(), ServerFnError>>,
+) -> impl IntoView {
     let params = use_params::<ListingParams>();
     let listing_id =
         move || params.with(|params| params.as_ref().map(|params| params.id).unwrap_or(-1));
-    let action = create_server_action::<DeleteTransactionOrder>();
 
     view! {
         <div class="popup active">
@@ -66,7 +67,7 @@ pub fn DeleteTransactionOrderPopup() -> impl IntoView {
 
 
         <div class="content-popup">
-        <ActionForm action=action>
+        <ActionForm action=delete_action>
             <h1>"Czy chcesz usunąć zlecenie transakcji?"</h1>
             <div class="delete_exchange_listing_form">
                 <input type="hidden" value={listing_id} name="trans_order_id" />
@@ -83,22 +84,12 @@ pub fn DeleteTransactionOrderPopup() -> impl IntoView {
 
 #[component]
 fn TransactionOrders() -> impl IntoView {
-    let transaction_orders = create_local_resource(
-        || (),
-        move |_| {
-            use crate::server::transaction_orders::get_user_transaction_orders;
-            get_user_transaction_orders()
-        },
-    );
-
-    // pub id: i64,
-    // pub sender_id: Option<i64>,
-    // pub reciver_username: Option<String>,
-    // pub amount: i64,
-    // pub currency_code: String,
-    // pub title: String,
-    // pub transaction_delay: i32,
-    // pub last_transaction: Option<String>,
+    use crate::utils::TransactionOrderssReload;
+    let transaction_orders_source = use_context::<TransactionOrderssReload>().unwrap().0;
+    let transaction_orders = create_local_resource(transaction_orders_source, move |_| {
+        use crate::server::transaction_orders::get_user_transaction_orders;
+        get_user_transaction_orders()
+    });
 
     view! {
         <div class="orders-table-top">"Odbiorca"</div>

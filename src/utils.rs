@@ -5,6 +5,17 @@ use crate::auth::User;
 pub type UserContextType =
     Resource<(usize, usize, usize, usize), Result<Option<User>, ServerFnError>>;
 
+// Custom type for providing and using context
+#[derive(Clone)]
+pub struct TransactionsReload(pub Memo<(usize, usize, usize)>);
+
+// Custom type for providing and using context
+#[derive(Clone)]
+pub struct ExchangeOffersReload(pub Memo<(usize, usize, usize)>);
+
+#[derive(Clone)]
+pub struct TransactionOrderssReload(pub Memo<(usize, usize)>);
+
 cfg_if! {
     if #[cfg(feature = "ssr")] {
         use crate::auth::AuthSession;

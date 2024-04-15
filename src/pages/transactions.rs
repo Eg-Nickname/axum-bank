@@ -138,14 +138,15 @@ fn Transactions() -> impl IntoView {
     // use crate::server::transactions::TransactionStatus;
 
     let (filter_status, set_filter_status) = create_signal(false);
+
+    use crate::utils::TransactionsReload;
+    let trans_source = use_context::<TransactionsReload>().unwrap().0;
+
     // WHY THE FUCK IS THIS NOT WORKING WITH NORMAL RESOURCE GOD ONLY KNOWS
-    let transactions = create_local_resource(
-        || (),
-        move |_| {
-            use crate::server::transactions::get_user_transactions;
-            get_user_transactions()
-        },
-    );
+    let transactions = create_local_resource(trans_source, move |_| {
+        use crate::server::transactions::get_user_transactions;
+        get_user_transactions()
+    });
 
     let user = use_context::<UserContextType>().expect("User resource shoud have been provided.");
 
