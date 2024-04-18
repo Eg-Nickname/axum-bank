@@ -229,7 +229,10 @@ pub async fn add_user_request(
     request_type: String,
 ) -> Result<(), ServerFnError> {
     match get_user().await {
-        Ok(Some(user)) => create_user_request(user.id, request_message, request_type.into()).await,
+        Ok(Some(user)) => {
+            leptos_axum::redirect("/account");
+            create_user_request(user.id, request_message, request_type.into()).await
+        }
         _ => Err(ServerFnError::ServerError(
             "Can't get user to create user request.".to_string(),
         )),

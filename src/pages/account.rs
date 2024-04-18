@@ -2,6 +2,8 @@ use leptos::*;
 use leptos_router::*;
 
 use crate::components::require_perm::RequirePerm;
+use crate::components::select::*;
+
 use crate::server::account::AddUserRequest;
 use crate::server::account::ChangePassword;
 use crate::server::account::DeleteApiToken;
@@ -43,7 +45,13 @@ fn UserRequests() -> impl IntoView {
 
             <div class="transacition-input-box">
                 <i>"Typ sprawy"</i>
-                <input type="text" placeholder="Feature request" name="request_type" class="text-input" />
+                // <input type="text" placeholder="Feature request" name="request_type" class="text-input" />
+
+                <SelectInput display_text="Wybierz typ" name="request_type">
+                    <SelectOption option_text="Dodaj walute" option_value="AddCurrency" />
+                    <SelectOption option_text="Dodaj token API" option_value="GetApiPerm" />
+                    <SelectOption option_text="Inna" option_value="Diffrent" />
+                </SelectInput>
             </div>
 
             <div class="transacition-input-box">
