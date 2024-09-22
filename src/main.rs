@@ -15,8 +15,9 @@ if #[cfg(feature = "ssr")] {
     // use leptos_image::*;
     use leptos_axum::{generate_route_list, LeptosRoutes, handle_server_fns_with_context};
     use sqlx::{PgPool, postgres::{PgPoolOptions}};
-    use axum_session::{SessionPgPool, SessionConfig, SessionLayer, SessionStore};
+    use axum_session::{SessionConfig, SessionLayer, SessionStore};
     use axum_session_auth::{AuthSession, AuthSessionLayer, AuthConfig};
+    use axum_session_sqlx::SessionPgPool;
 
 
     use axum_bank_narody::app::*;

@@ -1,5 +1,5 @@
 ## Jak uruchomić
-Aby uruchomić aplikację należy posiadać wersję `1.76.0-nightly` (wersja z funkcjami, które nie są ustabilizowane w normalnej wersji) języka Rust lub nowszą. By uzyskać wersję nighly należy wykonać polecenia:
+Aby uruchomić aplikację należy posiadać wersję `1.83.0-nightly` (wersja z funkcjami, które nie są ustabilizowane w normalnej wersji) języka Rust lub nowszą. By uzyskać wersję nighly należy wykonać polecenia:
 ```bash
 rustup toolchain install nightly
 rustup default nightly
@@ -8,13 +8,13 @@ Należy również dodać architekturę kompilacji (architektura wasm pozwala na 
 ```bash
 rustup target add wasm32-unknown-unknown
 ```
-Do wykonywania migracji na bazie danych będzie potrzebne dodatkowe narzędzie biblioteki `sqlx` o nazwie `sqlx-cli` w wersji `0.7.1`, które możemy pobrać używając komendy (`cargo` jest menadżerem bibliotek oraz aplikacji terminalowych języka Rust)
+Do wykonywania migracji na bazie danych będzie potrzebne dodatkowe narzędzie biblioteki `sqlx` o nazwie `sqlx-cli`, które możemy pobrać używając komendy (`cargo` jest menadżerem bibliotek oraz aplikacji terminalowych języka Rust)
 ```bash
 cargo install sqlx-cli
 ```
-By skompilować stronę oraz udostępnić ją w internecię będzie potrzebne narzędzie `cargo-lepts` w wersji `2.16.0`, które zainstalujemy komendą:
+By skompilować stronę oraz udostępnić ją w internecię będzie potrzebne narzędzie `cargo-lepts` w wersji `2.20.0`, które zainstalujemy komendą:
 ```
-cargo install cargo-leptos --version "2.16.0"
+cargo install cargo-leptos --version "2.20.0"
 ``` 
 Po zainstalowaniu wymaganych aplikacji należy pobrać kod z platformy github:
 ```
@@ -31,7 +31,7 @@ cargo leptos serve
 
 ## How to run
 To run code you need:
-- Rust version `1.76.0-nightly` or newer and wasm compilation target
+- Rust version `1.83.0-nightly` or newer and wasm compilation target
 ```bash
 rustup toolchain install nightly
 rustup default nightly
@@ -41,9 +41,9 @@ rustup target add wasm32-unknown-unknown
 ```bash
 cargo install sqlx-cli
 ```
-- cargo-leptos version `2.16.0`
+- cargo-leptos version `2.20.0`
 ```bash
-cargo install cargo-leptos --version "2.16.0"
+cargo install cargo-leptos --version "2.20.0"
 ```
 - .env file containing database credentials 
 ```env

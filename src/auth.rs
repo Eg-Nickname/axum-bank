@@ -6,8 +6,10 @@ use std::collections::HashSet;
 cfg_if! {
 if #[cfg(feature = "ssr")] {
     use sqlx::PgPool;
-    use axum_session_auth::{SessionPgPool, Authentication, HasPermission};
+    use axum_session_auth::{Authentication, HasPermission};
+    use axum_session_sqlx::SessionPgPool;
     use bcrypt::{hash, verify, DEFAULT_COST};
+    // SessionPgPool
     pub type AuthSession = axum_session_auth::AuthSession<User, i64, SessionPgPool, PgPool>;
     use crate::utils::{pool, auth};
 }}
